@@ -36,7 +36,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -47,4 +46,11 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    // Additional dependencies (remove if already covered by libs.* above)
+    implementation("androidx.drawerlayout:drawerlayout:1.1.1")
+    implementation("androidx.fragment:fragment-ktx:1.5.5")
+
+    // Firebase dependencies (uncomment if needed)
+    // implementation("com.google.firebase:firebase-auth:21.1.0")
+    // implementation("com.google.firebase:firebase-firestore:24.5.1")
 }
