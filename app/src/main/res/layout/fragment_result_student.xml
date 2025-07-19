@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
+
 
     <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
@@ -12,24 +11,23 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/blue"
-        android:title="Assignments"
+        android:title="Student Dashboard"
         android:titleTextColor="@android:color/white" />
 
     <TextView
+        android:text="Your Results"
+        android:textSize="22sp"
+        android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Assignments"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="16dp" />
 
-    <!-- RecyclerView -->
+    <!-- RecyclerView takes remaining space -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvAssignments"
+        android:id="@+id/recyclerViewResults"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="12dp" />
+        android:layout_weight="1" />
 
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView

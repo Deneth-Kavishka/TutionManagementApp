@@ -1,8 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.studentapplication">
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- Declare camera hardware feature as optional -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -26,12 +31,13 @@
         </activity>
 
         <!-- Other Activities -->
-        <activity android:name=".StudentDashboardActivity" />
-        <activity android:name=".AttendanceActivity" />
-        <activity android:name=".Assignments" />
-        <activity android:name=".ProfileActivity" />
+        <activity android:name=".student.StudentDashboardActivity" />
 
+        <activity android:name=".student.AttendanceActivity" />
+        <activity android:name=".student.AssignmentActivity" />
+        <activity android:name=".student.ResultActivity" />
+        <activity android:name=".student.MaterialActivity" />
+        <activity android:name=".student.ProfileActivity" />
 
     </application>
-
 </manifest>

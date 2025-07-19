@@ -1,4 +1,4 @@
-package com.example.studentapplication
+package com.project.tuitionmanagementapp.student
 
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.project.tuitionmanagementapp.R
 
 class AttendanceAdapter(private val attendanceList: List<Attendance>) :
     RecyclerView.Adapter<AttendanceAdapter.AttendanceViewHolder>() {
@@ -29,7 +30,7 @@ class AttendanceAdapter(private val attendanceList: List<Attendance>) :
         holder.statusText.text = item.status
 
         holder.statusText.setTextColor(
-            if (item.status == "Present") Color.parseColor("#4CAF50") else Color.RED
+            if (item.status.equals("Present", ignoreCase = true)) Color.parseColor("#4CAF50") else Color.RED
         )
     }
 

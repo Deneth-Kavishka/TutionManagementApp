@@ -1,56 +1,62 @@
-package com.example.studentapplication
+// StudentDashboardActivity.kt
+package com.project.tuitionmanagementapp.student
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.project.tuitionmanagementapp.R
 
 class StudentDashboardActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_student_dashboard)
 
-        // Attendance card click
         val attendanceCard = findViewById<LinearLayout>(R.id.attendence1)
         attendanceCard.setOnClickListener {
-            val intent = Intent(this, AttendanceActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, AttendanceActivity::class.java))
         }
 
-        // Assignments card click (optional: if you have a card in layout)
         val assignmentsCard = findViewById<LinearLayout>(R.id.assignments1)
-        assignmentsCard?.setOnClickListener {
-            val intent = Intent(this, Assignments::class.java)
-            startActivity(intent)
+        assignmentsCard.setOnClickListener {
+            startActivity(Intent(this, AssignmentActivity::class.java))
         }
 
-        // Bottom Navigation setup
+        val resultsCard = findViewById<LinearLayout>(R.id.results1)
+        resultsCard.setOnClickListener {
+            startActivity(Intent(this, ResultActivity::class.java))
+        }
+
+        val materialsCard = findViewById<LinearLayout>(R.id.materials1)
+        materialsCard.setOnClickListener {
+            startActivity(Intent(this, MaterialActivity::class.java))
+        }
+
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNavigationView.selectedItemId = R.id.nav_home
 
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home -> true // Already here
-
+                R.id.nav_home -> true
                 R.id.nav_attendance -> {
                     startActivity(Intent(this, AttendanceActivity::class.java))
+                    finish()
                     overridePendingTransition(0, 0)
                     true
                 }
-
                 R.id.nav_assignments -> {
-                    startActivity(Intent(this, Assignments::class.java))
+                    startActivity(Intent(this, AssignmentActivity::class.java))
+                    finish()
                     overridePendingTransition(0, 0)
                     true
                 }
-
                 R.id.nav_profile -> {
                     startActivity(Intent(this, ProfileActivity::class.java))
+                    finish()
                     overridePendingTransition(0, 0)
                     true
                 }
-
                 else -> false
             }
         }

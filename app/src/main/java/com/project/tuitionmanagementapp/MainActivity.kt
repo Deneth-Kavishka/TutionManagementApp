@@ -1,9 +1,10 @@
-package com.example.studentapplication
+package com.project.tuitionmanagementapp
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import com.project.tuitionmanagementapp.student.StudentDashboardActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

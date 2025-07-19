@@ -1,4 +1,4 @@
-package com.example.studentapplication
+package com.project.tuitionmanagementapp.student
 
 import android.app.Activity
 import android.content.Intent
@@ -9,6 +9,7 @@ import android.provider.MediaStore
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.project.tuitionmanagementapp.R
 import java.io.InputStream
 
 class ProfileActivity : AppCompatActivity() {
@@ -23,16 +24,15 @@ class ProfileActivity : AppCompatActivity() {
 
     private var selectedImageUri: Uri? = null
 
-    // Modern image picker using Activity Result API
-    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    private val pickImageLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
         if (result.resultCode == Activity.RESULT_OK && result.data != null) {
             selectedImageUri = result.data!!.data
             try {
-                selectedImageUri?.let { uri ->
-                    val inputStream: InputStream? = contentResolver.openInputStream(uri)
-                    val bitmap = BitmapFactory.decodeStream(inputStream)
-                    ivProfile.setImageBitmap(bitmap)
-                }
+                val inputStream: InputStream? = contentResolver.openInputStream(selectedImageUri!!)
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+                ivProfile.setImageBitmap(bitmap)
             } catch (e: Exception) {
                 Toast.makeText(this, "Error loading image", Toast.LENGTH_SHORT).show()
             }
@@ -41,7 +41,7 @@ class ProfileActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_profile_student)  // or activity_profile.xml
+        setContentView(R.layout.fragment_profile_student) // ✅ make sure layout file is renamed!
 
         // Bind views
         ivProfile = findViewById(R.id.ivProfile)
@@ -52,19 +52,17 @@ class ProfileActivity : AppCompatActivity() {
         etPassword = findViewById(R.id.etPassword)
         btnSave = findViewById(R.id.btnSaveProfile)
 
-        // Set dummy data (replace with Firebase later)
+        // Dummy user data
         etUsername.setText("student123")
         etEmail.setText("student@email.com")
         etPhone.setText("0712345678")
         etPassword.setText("password123")
 
-        // Pick image
         btnEditPhoto.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             pickImageLauncher.launch(intent)
         }
 
-        // Save button
         btnSave.setOnClickListener {
             val name = etUsername.text.toString().trim()
             val email = etEmail.text.toString().trim()
@@ -74,7 +72,6 @@ class ProfileActivity : AppCompatActivity() {
             if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
             } else {
-                // You can save this data to Firebase or SharedPreferences
                 Toast.makeText(this, "Profile updated successfully!", Toast.LENGTH_SHORT).show()
             }
         }
