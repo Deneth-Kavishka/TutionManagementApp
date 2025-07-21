@@ -4,163 +4,87 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.database.*
 import com.project.tuitionmanagementapp.databinding.FragmentLoginBinding
+
+data class use (
+    val fullName: String = "",
+    val email: String = "",
+    val password: String = "",
+    val phoneNumber: String = "",
+    val address: String = "",
+    val nic: String = "",
+    val dob: String = "",
+    val role: String = "",
+    val userId: String = ""
+)
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: FragmentLoginBinding
-    private lateinit var auth: FirebaseAuth
-    private val database = Firebase.database.reference
+    private lateinit var database: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = FragmentLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Initialize Firebase Auth
-        auth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance().getReference("users")
 
-        // Auto-login if user exists
-        auth.currentUser?.let { user ->
-            checkUserRole(user.uid)
-        }
+        binding.loginButton.setOnClickListener {
+            val email = binding.email.text.toString().trim()
+            val password = binding.password.text.toString().trim()
 
-        binding.btnLogin.setOnClickListener {
-            val email = binding.etEmail.text.toString().trim()
-            val password = binding.etPassword.text.toString().trim()
-
-            if (validateInput(email, password)) {
-                loginUser(email, password)
+            if (email.isEmpty()) {
+                binding.email.error = "Email is required"
+                return@setOnClickListener
             }
+            if (password.isEmpty()) {
+                binding.password.error = "Password is required"
+                return@setOnClickListener
+            }
+
+            loginUser(email, password)
         }
 
-        binding.tvRegister.setOnClickListener {
+        binding.goToRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
-    }
 
-    private fun validateInput(email: String, password: String): Boolean {
-        binding.etEmail.error = null
-        binding.etPassword.error = null
-
-        var isValid = true
-
-        if (email.isEmpty()) {
-            binding.etEmail.error = "Email is required"
-            isValid = false
-        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            binding.etEmail.error = "Invalid email format"
-            isValid = false
+        binding.forgotPassword.setOnClickListener {
+            Toast.makeText(this, "Forgot Password feature coming soon!", Toast.LENGTH_SHORT).show()
         }
-
-        if (password.isEmpty()) {
-            binding.etPassword.error = "Password is required"
-            isValid = false
-        } else if (password.length < 6) {
-            binding.etPassword.error = "Password must be at least 6 characters"
-            isValid = false
-        }
-
-        return isValid
     }
 
     private fun loginUser(email: String, password: String) {
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val userId = auth.currentUser?.uid ?: run {
-                        showToast("Authentication error")
-                        return@addOnCompleteListener
-                    }
-                    // Find the user in Realtime Database by email
-                    findUserInDatabase(email, userId)
-                } else {
-                    handleLoginError(task.exception)
-                }
-            }
-    }
-
-    private fun findUserInDatabase(email: String, authUid: String) {
-        database.child("users").orderByChild("email").equalTo(email)
+        database.orderByChild("email").equalTo(email)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (!snapshot.exists()) {
-                        auth.signOut()
-                        showToast("User data not found in database")
+                        Toast.makeText(this@LoginActivity, "Account not found", Toast.LENGTH_SHORT).show()
                         return
                     }
 
-                    // Get the first matching user (email should be unique)
-                    val userEntry = snapshot.children.firstOrNull() ?: run {
-                        auth.signOut()
-                        showToast("User data not found")
-                        return
+                    for (userSnapshot in snapshot.children) {
+                        val user = userSnapshot.getValue(User::class.java)
+                        if (user != null && user.password == password) {
+                            Toast.makeText(
+                                this@LoginActivity,
+                                "Welcome ${user.fullName} (${user.role})",
+                                Toast.LENGTH_LONG
+                            ).show()
+
+                            // TODO: Navigate to dashboard based on user.role
+                            return
+                        }
                     }
 
-                    // Verify the user's role and proceed
-                    val role = userEntry.child("role").getValue(String::class.java) ?: run {
-                        auth.signOut()
-                        showToast("Role not specified")
-                        return
-                    }
-
-                    when (role) {
-                        "Student" -> {
-                            showToast("Student login successful")
-                            // Navigate to Student Dashboard
-                        }
-                        "Teacher" -> {
-                            showToast("Teacher login successful")
-                            // Navigate to Teacher Dashboard
-                        }
-                        "Admin" -> {
-                            showToast("Admin login successful")
-                            // Navigate to Admin Dashboard
-                        }
-                        else -> {
-                            auth.signOut()
-                            showToast("Invalid user role")
-                        }
-                    }
+                    Toast.makeText(this@LoginActivity, "Incorrect password", Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    showToast("Database error: ${error.message}")
+                    Toast.makeText(this@LoginActivity, "Database error: ${error.message}", Toast.LENGTH_SHORT).show()
                 }
             })
     }
-
-    private fun checkUserRole(authUid: String) {
-        // Since your database uses different IDs, we need to search by email
-        // First get the current user's email
-        val user = auth.currentUser
-        user?.email?.let { email ->
-            findUserInDatabase(email, authUid)
-        } ?: run {
-            auth.signOut()
-            showToast("User email not found")
-        }
-    }
-
-    private fun handleLoginError(exception: Exception?) {
-        val errorMessage = when (exception) {
-            is FirebaseAuthInvalidUserException -> "Account not found"
-            is FirebaseAuthInvalidCredentialsException -> "Invalid credentials"
-            else -> "Login failed: ${exception?.message}"
-        }
-        showToast(errorMessage)
-    }
-
-    private fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
-
 }
