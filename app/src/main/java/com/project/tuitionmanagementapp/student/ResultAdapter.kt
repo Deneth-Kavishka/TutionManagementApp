@@ -1,6 +1,5 @@
 package com.project.tuitionmanagementapp.student
 
-
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.project.tuitionmanagementapp.R
 
-class ResultAdapter(private val resultList: List<Result>) :
+class ResultAdapter(private val resultList: List<StudentResult>) :
     RecyclerView.Adapter<ResultAdapter.ResultViewHolder>() {
 
     class ResultViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

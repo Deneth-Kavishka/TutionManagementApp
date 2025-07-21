@@ -1,9 +1,8 @@
 package com.project.tuitionmanagementapp.student
 
-
-data class Result(
-    val subject: String,
-    val marks: Int,
-    val grade: String,
-    val comment: String
+data class StudentResult(
+    val subject: String = "",
+    val marks: Int = 0,
+    val grade: String = "",
+    val comment: String = ""
 )

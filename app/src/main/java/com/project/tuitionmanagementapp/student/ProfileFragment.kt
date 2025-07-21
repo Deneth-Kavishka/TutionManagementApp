@@ -1,79 +1,167 @@
 package com.project.tuitionmanagementapp.student
 
-import android.app.Activity
 import android.content.Intent
-import android.graphics.BitmapFactory
-import android.net.Uri
+import android.graphics.Bitmap
 import android.os.Bundle
-import android.provider.MediaStore
+import android.view.View
 import android.widget.*
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.project.tuitionmanagementapp.R
-import java.io.InputStream
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.WriterException
+import com.journeyapps.barcodescanner.BarcodeEncoder
+import com.project.tuitionmanagementapp.MainActivity
 
 class ProfileActivity : AppCompatActivity() {
 
-    private lateinit var ivProfile: ImageView
-    private lateinit var btnEditPhoto: Button
-    private lateinit var etUsername: EditText
-    private lateinit var etEmail: EditText
-    private lateinit var etPhone: EditText
-    private lateinit var etPassword: EditText
+    private lateinit var imgProfile: ImageView
+    private lateinit var imgQrCode: ImageView
+    private lateinit var tvDisplayName: TextView
+    private lateinit var edtName: EditText
+    private lateinit var edtUsername: EditText
+    private lateinit var edtPassword: EditText
+    private lateinit var edtEmail: EditText
+    private lateinit var edtPhone: EditText
     private lateinit var btnSave: Button
+    private lateinit var btnLogout: Button
 
-    private var selectedImageUri: Uri? = null
-
-    private val pickImageLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
-            selectedImageUri = result.data!!.data
-            try {
-                val inputStream: InputStream? = contentResolver.openInputStream(selectedImageUri!!)
-                val bitmap = BitmapFactory.decodeStream(inputStream)
-                ivProfile.setImageBitmap(bitmap)
-            } catch (e: Exception) {
-                Toast.makeText(this, "Error loading image", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
+    private var studentId: String = "S001"  // Fallback
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_profile_student) // ✅ make sure layout file is renamed!
+        setContentView(R.layout.fragment_profile_student)
 
-        // Bind views
-        ivProfile = findViewById(R.id.ivProfile)
-        btnEditPhoto = findViewById(R.id.btnEditPhoto)
-        etUsername = findViewById(R.id.etUsername)
-        etEmail = findViewById(R.id.etEmail)
-        etPhone = findViewById(R.id.etPhone)
-        etPassword = findViewById(R.id.etPassword)
-        btnSave = findViewById(R.id.btnSaveProfile)
+        setupToolbar()
+        bindViews()
+        loadIntentData()
+        setupListeners()
+    }
 
-        // Dummy user data
-        etUsername.setText("student123")
-        etEmail.setText("student@email.com")
-        etPhone.setText("0712345678")
-        etPassword.setText("password123")
+    private fun setupToolbar() {
+        val toolbar = findViewById<Toolbar>(R.id.toolbarStudent)
+        setSupportActionBar(toolbar)
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            title = "Edit Student Profile"
+        }
+    }
 
-        btnEditPhoto.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            pickImageLauncher.launch(intent)
+    private fun bindViews() {
+        imgProfile = findViewById(R.id.imgStudentProfile)
+        imgQrCode = findViewById(R.id.imgStudentQrCode)
+        tvDisplayName = findViewById(R.id.tvStudentDisplayName)
+        edtName = findViewById(R.id.edtStudentName)
+        edtUsername = findViewById(R.id.edtStudentUsername)
+        edtPassword = findViewById(R.id.edtStudentPassword)
+        edtEmail = findViewById(R.id.edtStudentEmail)
+        edtPhone = findViewById(R.id.edtStudentPhone)
+        btnSave = findViewById(R.id.btnSaveStudentProfile)
+        btnLogout = findViewById(R.id.btnLogout)
+    }
+
+    private fun loadIntentData() {
+        val studentName = intent.getStringExtra("student_name") ?: "Student"
+        val studentUsername = intent.getStringExtra("student_username") ?: ""
+        val studentEmail = intent.getStringExtra("student_email") ?: ""
+        val studentPhone = intent.getStringExtra("student_phone") ?: ""
+        studentId = intent.getStringExtra("student_id") ?: "S001"
+
+        val attendance = intent.getStringExtra("student_attendance") ?: "Not Available"
+        val result = intent.getStringExtra("student_result") ?: "Not Available"
+        val payment = intent.getStringExtra("student_payment") ?: "Not Available"
+
+        tvDisplayName.text = studentName
+        edtName.setText(studentName)
+        edtUsername.setText(studentUsername)
+        edtEmail.setText(studentEmail)
+        edtPhone.setText(studentPhone)
+
+        // ✅ QR includes full info
+        val qrData = """
+            {
+                "id": "$studentId",
+                "name": "$studentName",
+                "email": "$studentEmail",
+                "attendance": "$attendance",
+                "result": "$result",
+                "payment": "$payment"
+            }
+        """.trimIndent()
+
+        generateQrCode(qrData)
+    }
+
+    private fun setupListeners() {
+        tvDisplayName.setOnClickListener {
+            tvDisplayName.visibility = View.GONE
+            edtName.visibility = View.VISIBLE
+            edtName.requestFocus()
         }
 
         btnSave.setOnClickListener {
-            val name = etUsername.text.toString().trim()
-            val email = etEmail.text.toString().trim()
-            val phone = etPhone.text.toString().trim()
-            val password = etPassword.text.toString().trim()
+            val name = edtName.text.toString().trim()
+            val username = edtUsername.text.toString().trim()
+            val password = edtPassword.text.toString().trim()
+            val email = edtEmail.text.toString().trim()
+            val phone = edtPhone.text.toString().trim()
 
-            if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty()) {
+            if (name.isBlank() || username.isBlank() || password.isBlank() || email.isBlank() || phone.isBlank()) {
                 Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Profile updated successfully!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
+
+            saveProfileToFirebase(name, username, password, email, phone)
         }
+
+        btnLogout.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+        }
+    }
+
+    private fun generateQrCode(data: String) {
+        try {
+            val barcodeEncoder = BarcodeEncoder()
+            val bitmap: Bitmap = barcodeEncoder.encodeBitmap(data, BarcodeFormat.QR_CODE, 400, 400)
+            imgQrCode.setImageBitmap(bitmap)
+        } catch (e: WriterException) {
+            e.printStackTrace()
+            Toast.makeText(this, "Failed to generate QR code", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun saveProfileToFirebase(name: String, username: String, password: String, email: String, phone: String) {
+        val database = FirebaseDatabase.getInstance().reference
+        val studentRef = database.child("students").child(studentId)
+
+        val profileData = mapOf(
+            "name" to name,
+            "username" to username,
+            "password" to password,
+            "email" to email,
+            "phone" to phone
+        )
+
+        studentRef.setValue(profileData)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Profile updated!", Toast.LENGTH_SHORT).show()
+                tvDisplayName.text = name
+                tvDisplayName.visibility = View.VISIBLE
+                edtName.visibility = View.GONE
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to save profile", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
     }
 }
