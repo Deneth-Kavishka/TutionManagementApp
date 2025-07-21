@@ -2,12 +2,15 @@ package com.project.tuitionmanagementapp.auth
 
 import android.os.Bundle
 import android.widget.ArrayAdapter
+import android.widget.DatePicker
 import android.widget.Spinner
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.FirebaseDatabase
 import com.project.tuitionmanagementapp.R
 import com.project.tuitionmanagementapp.databinding.ActivityRegisterBinding
+import java.util.*
 
 data class User(
     val fullName: String,
@@ -16,21 +19,25 @@ data class User(
     val phoneNumber: String,
     val address: String,
     val nic: String,
-    val role: String
+    val dob: String,
+    val role: String,
+    val userId: String // New field to store generated ID
 )
 
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
     private lateinit var roleSpinner: Spinner
+    private lateinit var datePicker: DatePicker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Initialize Spinner
+        // Initialize Spinner and DatePicker
         roleSpinner = binding.roleSpinner
+        datePicker = findViewById(R.id.dob) // Use findViewById for DatePicker
         setupRoleSpinner()
 
         binding.registerButton.setOnClickListener {
@@ -59,38 +66,65 @@ class RegisterActivity : AppCompatActivity() {
     private fun registerUser() {
         val selectedRole = roleSpinner.selectedItem.toString()
 
-        // Validate that a role is selected (not the first hint item)
         if (selectedRole == "Select Role") {
             Toast.makeText(this, "Please select a valid role", Toast.LENGTH_SHORT).show()
             return
         }
 
+        val fullName = binding.fullName.text.toString().trim()
+        val email = binding.email.text.toString().trim()
+        val password = binding.password.text.toString().trim()
+        val phoneNumber = binding.phoneNumber.text.toString().trim()
+        val address = binding.address.text.toString().trim()
+        val nic = binding.nic.text.toString().trim()
+        val dob = getSelectedDate()
+
+        // Generate Role-based ID (e.g., STU202507209876)
+        val datePart = android.text.format.DateFormat.format("yyyyMMdd", Date())
+        val randomDigits = (1000..9999).random()
+        val userIdPrefix = when (selectedRole) {
+            "Student" -> "STU"
+            "Teacher" -> "TEA"
+            else -> "USR"
+        }
+        val generatedUserId = "$userIdPrefix$datePart$randomDigits"
+
         val user = User(
-            fullName = binding.fullName.text.toString().trim(),
-            email = binding.email.text.toString().trim(),
-            password = binding.password.text.toString().trim(),
-            phoneNumber = binding.phoneNumber.text.toString().trim(),
-            address = binding.address.text.toString().trim(),
-            nic = binding.nic.text.toString().trim(),
-            role = selectedRole
+            fullName = fullName,
+            email = email,
+            password = password,
+            phoneNumber = phoneNumber,
+            address = address,
+            nic = nic,
+            dob = dob,
+            role = selectedRole,
+            userId = generatedUserId
         )
 
         val database = FirebaseDatabase.getInstance()
         val userRef = database.getReference("users")
-        val userId = userRef.push().key ?: user.nic
 
-        userRef.child(userId).setValue(user)
+        userRef.child(generatedUserId).setValue(user)
             .addOnSuccessListener {
-                Toast.makeText(this, "Registration successful", Toast.LENGTH_SHORT).show()
-                finish()
+                AlertDialog.Builder(this)
+                    .setTitle("Registration Successful")
+                    .setMessage("Your $selectedRole ID is:\n\n$generatedUserId")
+                    .setPositiveButton("OK") { _, _ -> finish() }
+                    .show()
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Registration failed: ${it.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
+    private fun getSelectedDate(): String {
+        val day = datePicker.dayOfMonth
+        val month = datePicker.month + 1 // Month is 0-based
+        val year = datePicker.year
+        return String.format("%02d/%02d/%04d", day, month, year)
+    }
+
     private fun validateInput(): Boolean {
-        // Clear previous errors
         binding.fullName.error = null
         binding.email.error = null
         binding.password.error = null
@@ -150,7 +184,7 @@ class RegisterActivity : AppCompatActivity() {
             binding.nic.error = "NIC is required"
             valid = false
         } else if (!nic.matches("^[0-9]{9,12}$".toRegex())) {
-            binding.nic.error = "Invalid NIC format (9-12 digits)"
+            binding.nic.error = "Invalid NIC format (9–12 digits)"
             valid = false
         }
         if (role == "Select Role") {
