@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "589692143520",
+    "project_id": "tuitionmanagementapp-cb966",
+    "storage_bucket": "tuitionmanagementapp-cb966.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:589692143520:android:802505abea5e3c38a986c5",
+        "android_client_info": {
+          "package_name": "com.project.tuitionmanagementapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsEn_8CTVGvLdzfKeyzSTUE_P6Cs0LtA4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
