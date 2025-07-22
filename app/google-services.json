@@ -2,13 +2,16 @@
   "project_info": {
 
 
+
     "project_number": "926742248803",
     "project_id": "tuitionmanagementapp-a19ac",
     "storage_bucket": "tuitionmanagementapp-a19ac.firebasestorage.app"
+
   },
   "client": [
     {
       "client_info": {
+
         "mobilesdk_app_id": "1:917048836790:android:1b0ceeb69c21121a0e9c17",
         "android_client_info": {
           "package_name": "com.example.studentapplication"
@@ -32,6 +35,7 @@
       
         "mobilesdk_app_id": "1:926742248803:android:b9ea0d9ce7317d9edc2756",
 
+
         "android_client_info": {
           "package_name": "com.project.tuitionmanagementapp"
         }
@@ -39,6 +43,7 @@
       "oauth_client": [],
       "api_key": [
         {
+
 
 
           "current_key": "AIzaSyBsEn_8CTVGvLdzfKeyzSTUE_P6Cs0LtA4"
