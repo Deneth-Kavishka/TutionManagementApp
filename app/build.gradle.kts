@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.gms.google.services)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("com.google.gms.google-services") // ✅ Firebase plugin
 }
 
 android {
@@ -36,10 +39,12 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
@@ -99,4 +104,16 @@ feature/admin-dashboard
     // ✅ Firebase dependencies
     implementation("com.google.firebase:firebase-storage:20.3.0")
     implementation("com.google.firebase:firebase-database:20.3.0")
+}
+
+    // ✅ CardView support
+    implementation("androidx.cardview:cardview:1.0.0")
+
+    // ✅ Firebase dependencies
+    implementation("com.google.firebase:firebase-storage:20.3.0")
+    implementation("com.google.firebase:firebase-database:20.3.0")
+
+    // ✅ QR Code scanner
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+
 }

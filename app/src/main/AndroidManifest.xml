@@ -25,7 +25,9 @@
         android:theme="@style/Theme.TuitionManagementApp"
         tools:targetApi="31">
 
+
         <activity
+            android:name=".teacher.TeacherDashboardActivity"
  feature/admin-dashboard
             android:name=".admin.AdminDashboardActivity"
             android:exported="true"
@@ -39,6 +41,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".teacher.EditProfileActivity" />
+        <activity android:name=".teacher.AssignmentActivity" />
+        <activity android:name=".teacher.MaterialsActivity" />
+        <activity android:name=".teacher.AttendanceActivity" />
+        <activity android:name=".teacher.UploadResultActivity" />
+
+        <activity
+            android:name=".teacher.CaptureActivityPortrait"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 feature/admin-dashboard
 
 

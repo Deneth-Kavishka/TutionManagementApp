@@ -1,0 +1,55 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_row_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/edit_text_background"
+    android:padding="8dp"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/tvStudentId"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="ID"
+        android:textSize="14sp"
+        android:textColor="#000000"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/tvMark"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Mark"
+        android:textSize="14sp"
+        android:textColor="#000000"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/tvGrade"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Grade"
+        android:textSize="14sp"
+        android:textColor="#000000"
+        android:gravity="center" />
+
+    <ImageView
+        android:id="@+id/btnEdit"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:src="@android:drawable/ic_menu_edit"
+        android:contentDescription="Edit" />
+
+    <ImageView
+        android:id="@+id/btnDelete"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:src="@android:drawable/ic_menu_delete"
+        android:contentDescription="Delete" />
+</LinearLayout>
