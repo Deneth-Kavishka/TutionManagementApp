@@ -1,5 +1,6 @@
 package com.project.tuitionmanagementapp.auth
 
+
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -31,9 +32,11 @@ class LoginActivity : AppCompatActivity() {
 
         database = FirebaseDatabase.getInstance().getReference("users")
 
+
         binding.loginButton.setOnClickListener {
             val email = binding.email.text.toString().trim()
             val password = binding.password.text.toString().trim()
+
 
             if (email.isEmpty()) {
                 binding.email.error = "Email is required"
@@ -87,4 +90,8 @@ class LoginActivity : AppCompatActivity() {
                 }
             })
     }
+
+class LoginActivity {
+
+
 }
