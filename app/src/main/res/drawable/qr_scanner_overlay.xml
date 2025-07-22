@@ -1,0 +1,37 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <!-- TextureView for camera preview -->
+    <TextureView
+        android:id="@+id/textureView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Scanning frame overlay -->
+    <ImageView
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_gravity="center"
+        android:src="@drawable/qr_frame" />
+
+    <!-- Scanning line animation -->
+    <View
+        android:id="@+id/scanLine"
+        android:layout_width="300dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center"
+        android:background="@color/colorAccent"
+        android:visibility="invisible" />
+
+    <!-- Success indicator -->
+    <ImageView
+        android:id="@+id/scanSuccess"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_check_circle"
+        android:visibility="invisible" />
+
+</FrameLayout>

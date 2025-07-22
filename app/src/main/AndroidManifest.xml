@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+
     <!-- Permissions -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
@@ -9,6 +10,20 @@
 
     <!-- Declare camera hardware feature as optional -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
+
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-feature android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
+
 
     <application
         android:allowBackup="true"
@@ -21,15 +36,29 @@
         android:theme="@style/Theme.TuitionManagementApp"
         tools:targetApi="31">
 
+
         <!-- Launch Dashboard first -->
         <activity
             android:name=".student.StudentDashboardActivity"
+
+
+        <activity
+            android:name=".teacher.TeacherDashboardActivity"
+
+            android:name=".admin.AdminDashboardActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+
+            android:name=".ParentPortalActivity"
+
             android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
 
         <!-- Other Activities -->
 
@@ -42,3 +71,32 @@
 
     </application>
 </manifest>
+
+        <activity android:name=".teacher.EditProfileActivity" />
+        <activity android:name=".teacher.AssignmentActivity" />
+        <activity android:name=".teacher.MaterialsActivity" />
+        <activity android:name=".teacher.AttendanceActivity" />
+        <activity android:name=".teacher.UploadResultActivity" />
+
+        <activity
+            android:name=".teacher.CaptureActivityPortrait"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+
+
+
+
+
+    </application>
+
+
+        <!-- Add this for QR Scanner -->
+        <activity
+            android:name=".admin.QRScannerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+    </application>
+</manifest>
+

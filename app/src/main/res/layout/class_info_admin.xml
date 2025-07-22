@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardElevation="0dp"
+    android:background="@android:color/white">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+            <TextView
+                android:layout_width="378dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40px"
+                android:layout_marginBottom="4dp"
+                android:background="#471396"
+                android:padding="26px"
+                android:text="Class Information"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+            <!-- Class Name -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/classNameText"
+                android:text="Class name: Chemistry"
+                android:textSize="20sp"
+                android:layout_marginBottom="14dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/DescriptionText"
+                android:text="Description: Grade 12 paper class"
+                android:textSize="20sp"
+                android:layout_marginBottom="14dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/StartTimeText"
+                android:text="Start time: 08:00 AM"
+                android:textSize="20sp"
+                android:layout_marginBottom="14dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/EndTimeText"
+                android:text="End time: 12:00 AM"
+                android:textSize="20sp"
+                android:layout_marginBottom="14dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/DefaultHallNoText"
+                android:text="Hall number: 1"
+                android:textSize="20sp"
+                android:layout_marginBottom="14dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/TeacherText"
+                android:text="Teacher ID: 1"
+                android:textSize="20sp"
+                android:layout_marginBottom="14dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/TeacherNameText"
+                android:text="Teacher name: Mr. John"
+                android:textSize="20sp"
+                android:layout_marginBottom="14dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/WeekNameText"
+                android:text="Week name: Monday"
+                android:textSize="20sp"
+                android:layout_marginBottom="5dp"/>
+
+            <!-- Dismiss Button -->
+            <Button
+                android:id="@+id/removeClassBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Remove"
+                android:backgroundTint="#D30606"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="8dp"
+                android:padding="12dp"/>
+            <Button
+                android:id="@+id/closePanelBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ok"
+                android:backgroundTint="#2196F3"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="8dp"
+                android:padding="12dp"/>
+        </LinearLayout>
+    </ScrollView>
+</androidx.cardview.widget.CardView>
