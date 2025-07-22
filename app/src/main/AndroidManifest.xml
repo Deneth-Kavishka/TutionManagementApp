@@ -26,14 +26,27 @@
         tools:targetApi="31">
 
         <activity
+ feature/admin-dashboard
             android:name=".admin.AdminDashboardActivity"
             android:exported="true"
             android:screenOrientation="portrait">
+
+            android:name=".ParentPortalActivity"
+            android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+feature/admin-dashboard
+
+
+
+
+
+    </application>
+
 
         <!-- Add this for QR Scanner -->
         <activity

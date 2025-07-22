@@ -10,7 +10,11 @@ android {
 
     defaultConfig {
         applicationId = "com.project.tuitionmanagementapp"
+ feature/admin-dashboard
         minSdk = 23  // Changed from 21 to 23 to match Firebase requirements
+
+        minSdk = 23
+
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -49,6 +53,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+feature/admin-dashboard
     implementation(libs.material)
 
     // UI components
@@ -83,7 +88,15 @@ dependencies {
     implementation("com.google.firebase:firebase-database-ktx")
 
     // Testing
+
+    implementation(libs.firebase.database.ktx)
+    implementation(libs.firebase.auth.ktx)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // ✅ Firebase dependencies
+    implementation("com.google.firebase:firebase-storage:20.3.0")
+    implementation("com.google.firebase:firebase-database:20.3.0")
 }
