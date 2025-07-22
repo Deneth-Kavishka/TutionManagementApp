@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_dashboard"
-            android:icon="@drawable/ic_dashboard"
-            android:title="Dashboard" />
+            android:id="@+id/admin_home"
+            android:icon="@drawable/home"
+            android:title="Home"
+            android:checked="true" />
         <item
-            android:id="@+id/nav_students"
-            android:icon="@drawable/ic_students"
-            android:title="Students" />
+            android:id="@+id/admin_account"
+            android:icon="@drawable/account"
+            android:title="Accounts" />
         <item
-            android:id="@+id/nav_teachers"
-            android:icon="@drawable/ic_teachers"
-            android:title="Teachers" />
+            android:id="@+id/admin_classes"
+            android:icon="@drawable/learn_svgrepo_com"
+            android:title="Classes" />
         <item
-            android:id="@+id/nav_courses"
-            android:icon="@drawable/ic_courses"
-            android:title="Courses" />
+            android:id="@+id/admin_reports"
+            android:icon="@drawable/reports_svgrepo_com"
+            android:title="Reports" />
         <item
-            android:id="@+id/nav_attendance"
-            android:icon="@drawable/ic_attendance"
-            android:title="Attendance" />
-        <item
-            android:id="@+id/nav_payments"
-            android:icon="@drawable/ic_payments"
-            android:title="Payments" />
-        <item
-            android:id="@+id/nav_notifications"
-            android:icon="@drawable/ic_notifications"
-            android:title="Notifications" />
+            android:id="@+id/admin_addClasses"
+            android:icon="@drawable/add_ellipse_svgrepo_com"
+            android:title="Add" />
+        <!-- <item
+             android:id="@+id/admin_Settings"
+             android:icon="@drawable/settings_svgrepo_com"
+             android:title="Settings" />-->
     </group>
 </menu>

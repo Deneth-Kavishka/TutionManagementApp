@@ -1,4 +1,4 @@
-package com.project.tuitionmanagementapp.common.models
+/*package com.project.tuitionmanagementapp.common.models
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -25,4 +25,4 @@ class StudentViewModel : ViewModel() {
     fun deleteStudent(studentId: String) {
         repository.deleteStudentById(studentId)
     }
-}
+}*/
