@@ -1,6 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F8FAFF"
+    android:fitsSystemWindows="true">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+    <!-- Scrollable Content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <!-- Title -->
+            <TextView
+                android:text="Upload Material"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#1565C0"
+                android:layout_marginBottom="20dp" />
+
+            <!-- PDF Icon -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:background="@drawable/dashed_border"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:id="@+id/btnChoosePdf"
+                    android:src="@drawable/ic_pdf"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_margin="8dp"
+                    android:contentDescription="Choose PDF" />
+            </LinearLayout>
+
+            <!-- Subject -->
+            <EditText
+                android:id="@+id/etSubject"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Subject"
+                android:minHeight="48dp"
+                android:padding="12dp"
+                android:background="@drawable/edit_text_background"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Topic -->
+            <EditText
+                android:id="@+id/etTopic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Topic"
+                android:minHeight="48dp"
+                android:padding="12dp"
+                android:background="@drawable/edit_text_background"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Grade Spinner -->
+            <Spinner
+                android:id="@+id/spinnerGrade"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:drawable/btn_dropdown"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- File Name -->
+            <TextView
+                android:id="@+id/tvFileName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No file selected"
+                android:textColor="#757575"
+                android:textSize="14sp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:layout_marginBottom="16dp">
+
+                <Button
+                    android:id="@+id/btnPreview"
+                    android:layout_weight="1"
+                    android:text="Preview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btnUpload"
+                    android:layout_weight="1"
+                    android:text="Upload"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="#1976D2"
+                    android:textColor="#ffffff" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

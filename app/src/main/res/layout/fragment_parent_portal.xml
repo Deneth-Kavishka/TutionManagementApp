@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F8F9FA">
@@ -7,7 +9,9 @@
     <!-- Scrollable Content -->
     <ScrollView
         android:layout_width="match_parent"
+
         android:layout_height="match_parent"
+e
         android:layout_weight="1"
         android:padding="16dp">
 
@@ -16,6 +20,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -23,30 +28,34 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
+
                 <ImageView
                     android:id="@+id/profileImage"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
+
                     android:layout_marginEnd="12dp"
                     android:contentDescription="Profile Picture"
                     android:scaleType="centerCrop"
                     android:src="@drawable/user_ic" />
+
 
                 <TextView
                     android:id="@+id/tvParentName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Welcome, Parent 👋"
-                    android:textColor="#212121"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
 
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="#212121" />
+            </LinearLayout>
 
             <!-- Attendance Card -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+
                 android:layout_marginBottom="12dp"
                 android:background="#E3F4F2"
                 android:elevation="2dp"
@@ -76,6 +85,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+
                 android:layout_marginBottom="12dp"
                 android:background="#E3F4F2"
                 android:elevation="2dp"
@@ -99,6 +109,7 @@
                     android:textColor="#2E7D32"
                     android:textSize="18sp"
                     android:textStyle="bold" />
+
             </LinearLayout>
 
 
@@ -106,6 +117,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+
                 android:layout_marginBottom="12dp"
                 android:background="#E3F4F2"
                 android:elevation="2dp"
@@ -113,10 +125,12 @@
                 android:padding="16dp"
                 android:textStyle="bold">
 
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="Fee Payment Status"
+
                     android:textColor="#666666"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -130,10 +144,12 @@
                     android:textColor="#2E7D32"
                     android:textSize="18sp"
                     android:textStyle="bold" />
+
             </LinearLayout>
             <!-- Upcoming Events Card -->
             <LinearLayout
                 android:layout_width="match_parent"
+
                 android:layout_height="match_parent"
                 android:layout_marginBottom="12dp"
                 android:background="#E3F2FD"
@@ -141,10 +157,12 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Upcoming Events"
+
                     android:textColor="#E53935"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -153,21 +171,25 @@
                     android:id="@+id/tvEvent1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+     
                     android:layout_marginTop="8dp"
                     android:text="• Parents Meeting – July 20 at 10:00 AM"
                     android:textColor="#212121"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
+
                 <TextView
                     android:id="@+id/tvEvent2"
                     android:layout_width="wrap_content"
+
                     android:layout_height="match_parent"
                     android:layout_marginTop="4dp"
                     android:text="• Mid-Term Exam – August 3"
                     android:textColor="#212121"
                     android:textSize="16sp"
                     android:textStyle="bold" />
+
 
 
             </LinearLayout>
@@ -183,7 +205,9 @@
         android:layout_height="60dp"
         android:orientation="horizontal"
         android:gravity="center"
+
         android:background="#77B2AE"
+
         android:elevation="6dp">
 
         <ImageView
