@@ -10,28 +10,28 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.FirebaseDatabase
 import com.project.tuitionmanagementapp.R
 
-class MaterialActivity : AppCompatActivity() {
+class ResultActivity : AppCompatActivity() {
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: MaterialAdapter
-    private lateinit var materialList: ArrayList<Material>
+    private lateinit var resultRecyclerView: RecyclerView
+    private lateinit var resultList: ArrayList<StudentResult>
+    private lateinit var adapter: ResultAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_materials_student)
+        setContentView(R.layout.fragment_result_student)
 
-        recyclerView = findViewById(R.id.recyclerViewMaterials)
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        resultRecyclerView = findViewById(R.id.recyclerViewResults)
+        resultRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        materialList = arrayListOf()
-        adapter = MaterialAdapter(materialList)
-        recyclerView.adapter = adapter
+        resultList = arrayListOf()
+        adapter = ResultAdapter(resultList)
+        resultRecyclerView.adapter = adapter
 
-        val studentId = "S001" // TODO: Make this dynamic on login
-        loadMaterialsFromFirebase(studentId)
+        val studentId = "S001" // TODO: Make dynamic based on login
+        loadResultsFromFirebase(studentId)
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
-        bottomNavigationView.selectedItemId = R.id.nav_home // fallback
+        bottomNavigationView.selectedItemId = R.id.nav_home // fallback default
 
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -60,18 +60,18 @@ class MaterialActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadMaterialsFromFirebase(studentId: String) {
-        val dbRef = FirebaseDatabase.getInstance().getReference("materials").child(studentId)
+    private fun loadResultsFromFirebase(studentId: String) {
+        val dbRef = FirebaseDatabase.getInstance().getReference("results").child(studentId)
 
         dbRef.get().addOnSuccessListener { snapshot ->
-            materialList.clear()
-            for (item in snapshot.children) {
-                val material = item.getValue(Material::class.java)
-                material?.let { materialList.add(it) }
+            resultList.clear()
+            for (record in snapshot.children) {
+                val result = record.getValue(StudentResult::class.java)
+                result?.let { resultList.add(it) }
             }
             adapter.notifyDataSetChanged()
         }.addOnFailureListener {
-            Toast.makeText(this, "Failed to load materials", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Failed to load results", Toast.LENGTH_SHORT).show()
         }
     }
 }

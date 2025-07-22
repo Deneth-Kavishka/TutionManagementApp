@@ -2,6 +2,9 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="blue">#1976D2</color>
+    <color name="light_blue">#E3F2FD</color>
+
     <color name="colorPrimary">#1134DE</color>
     <color name="colorAccent">#FF5722</color>
     <color name="colorSuccess">#4CAF50</color>
@@ -39,5 +42,6 @@
 
         <!-- Your specific requested colors -->
         <color name="gray_light">@color/gray_100</color>  <!-- Using the gray palette -->
+
 
 </resources>
