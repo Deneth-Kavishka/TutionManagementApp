@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    android:fitsSystemWindows="true">
+
+    <!-- 🔙 Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarUploadResult"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:title="Upload Assignment"
+        app:titleTextColor="@android:color/white" />
+
+    <!-- 📝 Assignment Form -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:background="#FFFFFF">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Upload Assignment"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#1565C0"
+                android:layout_marginBottom="24dp" />
+
+            <EditText
+                android:id="@+id/etAssignmentTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Assignment Title"
+                android:inputType="text"
+                android:minHeight="48dp"
+                android:padding="12dp"
+                android:background="@drawable/edit_text_background"
+                android:layout_marginBottom="12dp" />
+
+            <Spinner
+                android:id="@+id/spinnerGrade"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:background="@android:drawable/btn_dropdown"
+                android:layout_marginBottom="12dp" />
+
+            <EditText
+                android:id="@+id/etSubmissionDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Select Submission Date"
+                android:focusable="false"
+                android:clickable="true"
+                android:minHeight="48dp"
+                android:padding="12dp"
+                android:background="@drawable/edit_text_background"
+                android:layout_marginBottom="12dp" />
+
+            <EditText
+                android:id="@+id/etSubmissionTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Select Submission Time"
+                android:focusable="false"
+                android:clickable="true"
+                android:minHeight="48dp"
+                android:padding="12dp"
+                android:background="@drawable/edit_text_background"
+                android:layout_marginBottom="16dp" />
+
+            <Button
+                android:id="@+id/btnChooseFile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="Choose Attachment (PDF)"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#1976D2"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tvFileName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No file selected"
+                android:textColor="#757575"
+                android:textSize="14sp"
+                android:layout_marginBottom="16dp" />
+
+            <Button
+                android:id="@+id/btnUploadAssignment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="Upload Assignment"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#388E3C"
+                android:elevation="2dp" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
