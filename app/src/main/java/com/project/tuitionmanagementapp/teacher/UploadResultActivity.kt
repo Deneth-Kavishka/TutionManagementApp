@@ -1,193 +1,209 @@
 package com.project.tuitionmanagementapp.teacher
 
-import android.app.AlertDialog
 import android.os.Bundle
-import android.view.LayoutInflater
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.database.*
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.firestore.FirebaseFirestore
 import com.project.tuitionmanagementapp.R
 
 class UploadResultActivity : AppCompatActivity() {
 
-    private lateinit var etStudentId: EditText
-    private lateinit var spinnerGrade: Spinner
-    private lateinit var etSubject: EditText
-    private lateinit var etResultMark: EditText
-    private lateinit var btnAddResult: Button
+    private lateinit var firestore: FirebaseFirestore
     private lateinit var recyclerView: RecyclerView
-
-    private val resultList = mutableListOf<ResultModel>()
-    private val keyList = mutableListOf<String>()
+    private lateinit var fabUpload: FloatingActionButton
+    private lateinit var progressBar: ProgressBar
     private lateinit var adapter: ResultAdapter
-
-    private val dbRef = FirebaseDatabase.getInstance().getReference("student_results")
+    private var resultsList = ArrayList<ResultModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_upload_result)
 
+        initializeViews()
+        setupRecyclerView()
+        loadResults()
 
-
-        etStudentId = findViewById(R.id.etStudentId)
-        spinnerGrade = findViewById(R.id.spinnerGrade)
-        etSubject = findViewById(R.id.etSubject)
-        etResultMark = findViewById(R.id.etResultMark)
-        btnAddResult = findViewById(R.id.btnAddResult)
-        recyclerView = findViewById(R.id.recyclerViewResults)
-
-        val grades = listOf("Select Grade", "Grade 7", "Grade 8", "Grade 9", "Grade 10")
-        spinnerGrade.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, grades)
-
-        adapter = ResultAdapter(
-            resultList,
-            onEdit = { result, key -> showEditDialog(result, key) },
-            onDelete = { key -> deleteResult(key) }
-        )
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = adapter
-
-        btnAddResult.setOnClickListener {
-            val studentId = etStudentId.text.toString().trim()
-            val grade = spinnerGrade.selectedItem.toString()
-            val subject = etSubject.text.toString().trim()
-            val markText = etResultMark.text.toString().trim()
-
-            if (studentId.isEmpty() || grade == "Select Grade" || subject.isEmpty() || markText.isEmpty()) {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val mark = markText.toIntOrNull()
-            if (mark == null || mark < 0 || mark > 100) {
-                Toast.makeText(this, "Enter a valid mark (0–100)", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val resultGrade = when {
-                mark >= 90 -> "A+"
-                mark >= 85 -> "A"
-                mark >= 75 -> "A-"
-                mark >= 65 -> "B+"
-                mark >= 60 -> "B"
-                mark >= 55 -> "B-"
-                mark >= 50 -> "C+"
-                mark >= 45 -> "C"
-                mark >= 40 -> "C-"
-                else -> "Fail"
-            }
-
-            val data = ResultModel(studentId, grade, subject, "$mark - $resultGrade")
-
-            val key = dbRef.push().key ?: return@setOnClickListener
-            dbRef.child(key).setValue(data)
-                .addOnSuccessListener {
-                    resultList.add(data)
-                    keyList.add(key)
-                    adapter.setKeys(keyList)
-                    adapter.notifyItemInserted(resultList.size - 1)
-                    clearInputs()
-                    Toast.makeText(this, "Result Uploaded", Toast.LENGTH_SHORT).show()
-                }
-                .addOnFailureListener {
-                    Toast.makeText(this, "Upload Failed: ${it.message}", Toast.LENGTH_SHORT).show()
-                }
+        fabUpload.setOnClickListener {
+            showUploadDialog()
         }
 
-        loadResults()
+        // Back button
+        findViewById<ImageView>(R.id.backButton).setOnClickListener {
+            finish()
+        }
+    }
+
+    private fun initializeViews() {
+        firestore = FirebaseFirestore.getInstance()
+        recyclerView = findViewById(R.id.rvResults)
+        fabUpload = findViewById(R.id.fabUploadResult)
+        progressBar = findViewById(R.id.progressBar)
+    }
+
+    private fun setupRecyclerView() {
+        adapter = ResultAdapter(resultsList) { result ->
+            showEditDialog(result)
+        }
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
     }
 
     private fun loadResults() {
-        dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                resultList.clear()
-                keyList.clear()
-                for (child in snapshot.children) {
-                    val result = child.getValue(ResultModel::class.java)
-                    if (result != null) {
-                        resultList.add(result)
-                        keyList.add(child.key!!)
-                    }
+        progressBar.visibility = View.VISIBLE
+        firestore.collection("results")
+            .get()
+            .addOnSuccessListener { documents ->
+                resultsList.clear()
+                for (document in documents) {
+                    val result = document.toObject(ResultModel::class.java)
+                    resultsList.add(result)
                 }
-                adapter.setKeys(keyList)
+                resultsList.sortByDescending { it.examDate }
                 adapter.notifyDataSetChanged()
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(this@UploadResultActivity, "Failed to load results", Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
-
-    private fun clearInputs() {
-        etStudentId.setText("")
-        etSubject.setText("")
-        etResultMark.setText("")
-        spinnerGrade.setSelection(0)
-    }
-
-    private fun showEditDialog(result: ResultModel, key: String) {
-        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_edit_result, null)
-        val editMark = dialogView.findViewById<EditText>(R.id.etEditMark)
-        editMark.setText(result.result.split(" - ")[0])
-
-        AlertDialog.Builder(this)
-            .setTitle("Edit Result")
-            .setView(dialogView)
-            .setPositiveButton("Update") { _, _ ->
-                val newMark = editMark.text.toString().trim().toIntOrNull()
-                if (newMark == null || newMark !in 0..100) {
-                    Toast.makeText(this, "Invalid mark", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
-                }
-
-                val newGrade = when {
-                    newMark >= 90 -> "A+"
-                    newMark >= 85 -> "A"
-                    newMark >= 75 -> "A-"
-                    newMark >= 65 -> "B+"
-                    newMark >= 60 -> "B"
-                    newMark >= 55 -> "B-"
-                    newMark >= 50 -> "C+"
-                    newMark >= 45 -> "C"
-                    newMark >= 40 -> "C-"
-                    else -> "Fail"
-                }
-
-                val updatedResult = result.copy(result = "$newMark - $newGrade")
-                dbRef.child(key).setValue(updatedResult)
-                    .addOnSuccessListener {
-                        val index = keyList.indexOf(key)
-                        if (index != -1) {
-                            resultList[index] = updatedResult
-                            adapter.notifyItemChanged(index)
-                        }
-                        Toast.makeText(this, "Result Updated", Toast.LENGTH_SHORT).show()
-                    }
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-
-    private fun deleteResult(key: String) {
-        dbRef.child(key).removeValue()
-            .addOnSuccessListener {
-                val index = keyList.indexOf(key)
-                if (index != -1) {
-                    resultList.removeAt(index)
-                    keyList.removeAt(index)
-                    adapter.setKeys(keyList)
-                    adapter.notifyItemRemoved(index)
-                    Toast.makeText(this, "Deleted", Toast.LENGTH_SHORT).show()
-                }
+                progressBar.visibility = View.GONE
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Delete failed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Failed to load results", Toast.LENGTH_SHORT).show()
+                progressBar.visibility = View.GONE
             }
     }
 
+    private fun showUploadDialog(existingResult: ResultModel? = null) {
+        val dialog = android.app.AlertDialog.Builder(this)
+            .setView(R.layout.dialog_upload_result)
+            .create()
+
+        dialog.show()
+
+        // Initialize dialog views
+        val spinnerStudent = dialog.findViewById<AutoCompleteTextView>(R.id.spinnerStudent)
+        val spinnerSubject = dialog.findViewById<AutoCompleteTextView>(R.id.spinnerSubject)
+        val edtMarks = dialog.findViewById<TextInputEditText>(R.id.edtMarks)
+        val tvGrade = dialog.findViewById<TextView>(R.id.tvCalculatedGrade)
+        val edtComment = dialog.findViewById<TextInputEditText>(R.id.edtComment)
+        val btnSubmit = dialog.findViewById<Button>(R.id.btnSubmit)
+        val btnCancel = dialog.findViewById<Button>(R.id.btnCancel)
+
+        // Load students for spinner
+        loadStudentsForSpinner(spinnerStudent)
+
+        // Load subjects for spinner
+        loadSubjectsForSpinner(spinnerSubject)
+
+        // Calculate grade on marks change
+        edtMarks?.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val marks = s.toString().toIntOrNull() ?: 0
+                val result = ResultModel(marks = marks)
+                tvGrade?.text = "Grade: ${result.calculateGrade()}"
+            }
+        })
+
+        // Set existing data if editing
+        existingResult?.let {
+            spinnerStudent?.setText(it.studentName)
+            spinnerSubject?.setText(it.subject)
+            edtMarks?.setText(it.marks.toString())
+            edtComment?.setText(it.comment)
+        }
+
+        // Handle submit
+        btnSubmit?.setOnClickListener {
+            val studentName = spinnerStudent?.text.toString()
+            val subject = spinnerSubject?.text.toString()
+            val marks = edtMarks?.text.toString().toIntOrNull() ?: 0
+            val comment = edtComment?.text.toString()
+
+            if (validateInputs(studentName, subject, marks)) {
+                val result = ResultModel(
+                    id = existingResult?.id,
+                    studentName = studentName,
+                    subject = subject,
+                    marks = marks,
+                    grade = ResultModel(marks = marks).calculateGrade(),
+                    comment = comment
+                )
+                saveResult(result, dialog)
+            }
+        }
+
+        btnCancel?.setOnClickListener {
+            dialog.dismiss()
+        }
     }
 
+    private fun loadStudentsForSpinner(spinner: AutoCompleteTextView?) {
+        firestore.collection("students")
+            .get()
+            .addOnSuccessListener { documents ->
+                val students = documents.mapNotNull { it.getString("name") }
+                val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, students)
+                spinner?.setAdapter(adapter)
+            }
+    }
+
+    private fun loadSubjectsForSpinner(spinner: AutoCompleteTextView?) {
+        val subjects = listOf("Mathematics", "Science", "English", "Physics", "Chemistry", "Biology")
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, subjects)
+        spinner?.setAdapter(adapter)
+    }
+
+    private fun validateInputs(studentName: String, subject: String, marks: Int): Boolean {
+        if (studentName.isBlank()) {
+            Toast.makeText(this, "Please select a student", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        if (subject.isBlank()) {
+            Toast.makeText(this, "Please select a subject", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        if (marks <= 0 || marks > 100) {
+            Toast.makeText(this, "Please enter valid marks (1-100)", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        return true
+    }
+
+    private fun saveResult(result: ResultModel, dialog: android.app.AlertDialog) {
+        progressBar.visibility = View.VISIBLE
+
+        val resultMap = hashMapOf(
+            "studentName" to result.studentName,
+            "subject" to result.subject,
+            "marks" to result.marks,
+            "grade" to result.grade,
+            "comment" to result.comment,
+            "examDate" to System.currentTimeMillis()
+        )
+
+        val collection = firestore.collection("results")
+        val task = if (result.id != null) {
+            collection.document(result.id).set(resultMap)
+        } else {
+            collection.add(resultMap)
+        }
+
+        task.addOnSuccessListener {
+            Toast.makeText(this, "Result saved successfully", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+            loadResults()
+        }.addOnFailureListener {
+            Toast.makeText(this, "Failed to save result", Toast.LENGTH_SHORT).show()
+        }.addOnCompleteListener {
+            progressBar.visibility = View.GONE
+        }
+    }
+
+    private fun showEditDialog(result: ResultModel) {
+        showUploadDialog(result)
+    }
+}

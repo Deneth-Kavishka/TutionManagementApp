@@ -91,4 +91,14 @@ dependencies {
     // --- Optional (QR Code with ZXing) ---
      implementation("com.journeyapps:zxing-android-embedded:4.3.0")
      implementation("com.google.zxing:core:3.5.1")
+
+    // Cloudinary
+    implementation("com.cloudinary:cloudinary-android:2.3.1")
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+
+    // File picker
+    implementation("com.github.dhaval2404:imagepicker:2.1")
+
+    // Material Components
+    implementation("com.google.android.material:material:1.9.0")
 }

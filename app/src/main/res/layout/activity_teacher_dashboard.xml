@@ -193,6 +193,7 @@
 
                 <!-- Take Attendance Card -->
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/attendanceCard"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -227,6 +228,7 @@
 
                 <!-- Upload Materials Card -->
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/materialsCard"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -268,6 +270,7 @@
 
                 <!-- Assignments Card -->
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/assignmentsCard"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -302,6 +305,7 @@
 
                 <!-- Grade Results Card -->
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/resultsCard"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -504,9 +508,6 @@
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="#471396"
-        app:itemIconTint="#FFC107"
-        app:itemTextColor="#FFC107"
+        android:background="#FFFFFF"
         app:menu="@menu/bottom_nav_menu_teacher" />
 </LinearLayout>

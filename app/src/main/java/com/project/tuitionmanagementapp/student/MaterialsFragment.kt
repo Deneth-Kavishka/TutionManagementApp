@@ -1,77 +1,120 @@
 package com.project.tuitionmanagementapp.student
 
-import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.database.FirebaseDatabase
 import com.project.tuitionmanagementapp.R
 
-class MaterialActivity : AppCompatActivity() {
+class MaterialsFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: MaterialAdapter
     private lateinit var materialList: ArrayList<Material>
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_materials_student)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_materials_student, container, false)
+        setupRecyclerView(view)
+        loadMaterialsFromFirebase()
+        return view
+    }
 
-        recyclerView = findViewById(R.id.recyclerViewMaterials)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-
+    private fun setupRecyclerView(view: View) {
+        recyclerView = view.findViewById(R.id.recyclerViewMaterials)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
         materialList = arrayListOf()
         adapter = MaterialAdapter(materialList)
         recyclerView.adapter = adapter
+    }
 
-        val studentId = "S001" // TODO: Make this dynamic on login
-        loadMaterialsFromFirebase(studentId)
+    private fun loadMaterialsFromFirebase() {
+        val database = FirebaseDatabase.getInstance()
+        val materialsRef = database.getReference("materials")
 
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
-        bottomNavigationView.selectedItemId = R.id.nav_home // fallback
+        materialsRef.get().addOnSuccessListener { snapshot ->
+            materialList.clear()
 
-        bottomNavigationView.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_home -> {
-                    startActivity(Intent(this, StudentDashboardActivity::class.java))
-                    overridePendingTransition(0, 0)
-                    true
+            for (materialSnapshot in snapshot.children) {
+                val material = materialSnapshot.getValue(Material::class.java)
+                material?.let {
+                    materialList.add(it)
                 }
-                R.id.nav_attendance -> {
-                    startActivity(Intent(this, AttendanceActivity::class.java))
-                    overridePendingTransition(0, 0)
-                    true
-                }
-                R.id.nav_assignments -> {
-                    startActivity(Intent(this, AssignmentActivity::class.java))
-                    overridePendingTransition(0, 0)
-                    true
-                }
-                R.id.nav_profile -> {
-                    startActivity(Intent(this, ProfileActivity::class.java))
-                    overridePendingTransition(0, 0)
-                    true
-                }
-                else -> false
             }
+
+            // If no materials found, add sample data
+            if (materialList.isEmpty()) {
+                addSampleMaterials()
+            }
+
+            materialList.sortBy { it.title }
+            adapter.notifyDataSetChanged()
+        }.addOnFailureListener {
+            Toast.makeText(requireContext(), "Failed to load materials", Toast.LENGTH_SHORT).show()
+            // Add sample data even on failure
+            addSampleMaterials()
+            adapter.notifyDataSetChanged()
         }
     }
 
-    private fun loadMaterialsFromFirebase(studentId: String) {
-        val dbRef = FirebaseDatabase.getInstance().getReference("materials").child(studentId)
+    private fun addSampleMaterials() {
+        // Mathematics Materials
+        materialList.add(Material(
+            "Algebra Fundamentals",
+            "PDF",
+            "https://academix.com/materials/algebra_basics.pdf"
+        ))
+        materialList.add(Material(
+            "Calculus Introduction",
+            "Video",
+            "https://academix.com/videos/calc_intro.mp4"
+        ))
+        materialList.add(Material(
+            "Geometry Practice Problems",
+            "PDF",
+            "https://academix.com/materials/geometry_practice.pdf"
+        ))
 
-        dbRef.get().addOnSuccessListener { snapshot ->
-            materialList.clear()
-            for (item in snapshot.children) {
-                val material = item.getValue(Material::class.java)
-                material?.let { materialList.add(it) }
-            }
-            adapter.notifyDataSetChanged()
-        }.addOnFailureListener {
-            Toast.makeText(this, "Failed to load materials", Toast.LENGTH_SHORT).show()
-        }
+        // Science Materials
+        materialList.add(Material(
+            "Chemistry Lab Safety Guide",
+            "PDF",
+            "https://academix.com/materials/lab_safety.pdf"
+        ))
+        materialList.add(Material(
+            "Physics Experiments Demo",
+            "Video",
+            "https://academix.com/videos/physics_lab.mp4"
+        ))
+        materialList.add(Material(
+            "Biology Cell Structure Notes",
+            "PDF",
+            "https://academix.com/materials/cell_structure.pdf"
+        ))
+
+        // English Materials
+        materialList.add(Material(
+            "Essay Writing Guide",
+            "PDF",
+            "https://academix.com/materials/essay_guide.pdf"
+        ))
+        materialList.add(Material(
+            "Literature Analysis Methods",
+            "Video",
+            "https://academix.com/videos/lit_analysis.mp4"
+        ))
+        materialList.add(Material(
+            "Grammar and Punctuation Rules",
+            "PDF",
+            "https://academix.com/materials/grammar_rules.pdf"
+        ))
     }
 }

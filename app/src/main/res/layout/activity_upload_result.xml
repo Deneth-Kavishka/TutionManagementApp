@@ -1,123 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/layoutUploadResult"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:background="#F8FAFF">
+    android:background="#FFFFFF">
 
+    <!-- Header Section -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#471396">
 
-    <TextView
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/backButton"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_arrow_back"
+                android:tint="#FFFFFF"
+                android:background="@drawable/circular_account_background"
+                android:padding="4dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Student Results"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginStart="16dp"
+                app:layout_constraintStart_toEndOf="@id/backButton"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Filter Section -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Filter Results"
+                        android:textColor="#471396"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp"/>
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/filterChipGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:singleLine="true"
+                        app:singleSelection="true">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipAll"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="All"
+                            android:checked="true"
+                            style="@style/Widget.MaterialComponents.Chip.Filter"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipPass"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Pass"
+                            style="@style/Widget.MaterialComponents.Chip.Filter"/>
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipFail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Fail"
+                            style="@style/Widget.MaterialComponents.Chip.Filter"/>
+                    </com.google.android.material.chip.ChipGroup>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Results List -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvResults"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Upload FAB -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabUploadResult"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Upload Student Result"
-        android:textColor="#050505"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp" />
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_add"
+        android:backgroundTint="#471396"
+        app:tint="#FFFFFF"/>
 
-    <!-- Student ID -->
-    <EditText
-        android:id="@+id/etStudentId"
-        android:layout_width="match_parent"
+    <!-- Progress Bar -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Student ID"
-        android:inputType="text"
-        android:autofillHints="username"
-        android:minHeight="48dp"
-        android:background="@drawable/edit_text_background"
-        android:padding="12dp"
-        android:layout_marginBottom="12dp" />
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:indeterminateTint="#471396"/>
 
-    <!-- Grade Spinner -->
-    <Spinner
-        android:id="@+id/spinnerGrade"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:padding="12dp"
-        android:layout_marginBottom="12dp" />
-
-    <!-- Subject -->
-    <EditText
-        android:id="@+id/etSubject"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Subject"
-        android:inputType="text"
-        android:autofillHints="username"
-        android:minHeight="48dp"
-        android:background="@drawable/edit_text_background"
-        android:padding="12dp"
-        android:layout_marginBottom="12dp" />
-
-    <!-- Result Mark -->
-    <EditText
-        android:id="@+id/etResultMark"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Result Mark (0 - 100)"
-        android:inputType="number"
-        android:autofillHints="number"
-        android:minHeight="48dp"
-        android:background="@drawable/edit_text_background"
-        android:padding="12dp"
-        android:layout_marginBottom="12dp" />
-
-    <!-- Add Button -->
-    <Button
-        android:id="@+id/btnAddResult"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Add Result"
-        android:minHeight="48dp"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#1976D2"
-        android:layout_marginBottom="20dp" />
-
-    <!-- Table Header -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="#1976D2"
-        android:padding="8dp"
-        android:layout_marginBottom="4dp">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Student ID"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:gravity="center" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Mark"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:gravity="center" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Grade"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:gravity="center" />
-    </LinearLayout>
-
-    <!-- RecyclerView Table -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewResults"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="#FFFFFF" />
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

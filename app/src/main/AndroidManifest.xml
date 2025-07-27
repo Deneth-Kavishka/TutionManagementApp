@@ -63,7 +63,7 @@
         <activity android:name=".student.AttendanceActivity" />
         <activity android:name=".student.AssignmentActivity" />
         <activity android:name=".student.ResultActivity" />
-        <activity android:name=".student.MaterialActivity" />
+        <activity android:name=".student.MaterialsActivity" />
         <activity android:name=".student.ProfileActivity" />
 
         <!-- Teacher Activities -->
@@ -72,6 +72,8 @@
         <activity android:name=".teacher.MaterialsActivity" />
         <activity android:name=".teacher.AttendanceActivity" />
         <activity android:name=".teacher.UploadResultActivity" />
+        <activity android:name=".teacher.AnalyticsActivity" />
+        <activity android:name=".teacher.CalendarActivity" />
         <activity
             android:name=".teacher.CaptureActivityPortrait"
             android:screenOrientation="portrait"

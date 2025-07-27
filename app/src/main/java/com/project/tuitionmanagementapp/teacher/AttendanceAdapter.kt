@@ -1,28 +1,35 @@
 package com.project.tuitionmanagementapp.teacher
 
-import com.project.tuitionmanagementapp.R
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.project.tuitionmanagementapp.R
 
-class AttendanceAdapter(private val attendanceList: List<String>) :
-    RecyclerView.Adapter<AttendanceAdapter.AttendanceViewHolder>() {
+class AttendanceAdapter(private val attendanceList: List<QRAttendanceActivity.AttendanceRecord>) :
+    RecyclerView.Adapter<AttendanceAdapter.ViewHolder>() {
 
-    class AttendanceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tvAttendance: TextView = itemView.findViewById(R.id.tvAttendanceItem)
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val tvStudentName: TextView = view.findViewById(R.id.tvStudentName)
+        val tvTimestamp: TextView = view.findViewById(R.id.tvTimestamp)
+        val tvStatus: TextView = view.findViewById(R.id.tvStatus)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AttendanceViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_attendance, parent, false)
-        return AttendanceViewHolder(view)
+        return ViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: AttendanceViewHolder, position: Int) {
-        holder.tvAttendance.text = attendanceList[position]
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val record = attendanceList[position]
+
+        // Using explicit getters for each property to avoid compilation errors
+        holder.tvStudentName.text = record.studentName
+        holder.tvTimestamp.text = record.timestamp
+        holder.tvStatus.text = record.status
     }
 
-    override fun getItemCount(): Int = attendanceList.size
+    override fun getItemCount() = attendanceList.size
 }

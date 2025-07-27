@@ -11,61 +11,55 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:background="#471396">
+        android:background="#471396"
+        android:elevation="8dp">
 
+        <!-- Back Arrow -->
         <ImageView
-            android:id="@+id/logo_image"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/learn_svgrepo_com"
-            android:tint="#FFC107"
+            android:id="@+id/backButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_arrow_back"
+            android:tint="#FFFFFF"
+            android:background="@drawable/circular_account_background"
+            android:padding="4dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
+        <!-- Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ACADEMIX - Profile"
-            android:textColor="#FFC107"
+            android:text="Profile"
+            android:textColor="#FFFFFF"
             android:textStyle="bold"
             android:textSize="20sp"
-            android:layout_marginStart="12dp"
-            app:layout_constraintStart_toEndOf="@id/logo_image"
+            android:layout_marginStart="16dp"
+            app:layout_constraintStart_toEndOf="@id/backButton"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <!-- Options Menu Icon -->
+        <ImageView
+            android:id="@+id/imgOptions"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_menu"
+            android:tint="#FFFFFF"
+            android:background="@drawable/circular_account_background"
+            android:padding="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Content -->
-    <ScrollView
+    <!-- Fragment Container -->
+    <FrameLayout
+        android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Student Profile"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:textColor="#471396"
-                android:layout_marginBottom="16dp"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Your profile information will be displayed here."
-                android:textSize="16sp"
-                android:textColor="#666666"
-                android:layout_marginBottom="16dp"/>
-        </LinearLayout>
-    </ScrollView>
+        android:layout_weight="1" />
 
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -74,6 +68,7 @@
         android:layout_height="wrap_content"
         android:background="#471396"
         app:itemIconTint="#FFC107"
-        app:itemTextColor="#FFC107"
-        app:menu="@menu/student_nav_menu" />
+        app:itemTextColor="#FFFFFF"
+        app:menu="@menu/bottom_nav_menu_student" />
+
 </LinearLayout>
