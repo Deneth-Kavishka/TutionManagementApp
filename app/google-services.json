@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "249184556689",
+    "firebase_url": "https://adademix-40942-default-rtdb.firebaseio.com",
+    "project_id": "adademix-40942",
+    "storage_bucket": "adademix-40942.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:249184556689:android:43c22a80145c6a6381d130",
+        "android_client_info": {
+          "package_name": "com.project.tuitionmanagementapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXgUNMrZ2Y3sa0n7fw6M2fLoqfiHGn3-E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
