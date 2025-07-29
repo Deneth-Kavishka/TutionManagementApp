@@ -20,7 +20,7 @@
             android:id="@+id/imgMaterialIcon"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:src="@drawable/ic_document"
+            android:src="@drawable/baseline_article_24"
             android:tint="#471396"
             android:padding="4dp"/>
 
@@ -74,11 +74,11 @@
         </LinearLayout>
 
         <!-- Download/View Button -->
-        <ImageButton
+        <ImageView
             android:id="@+id/btnDownload"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/ic_download"
+            android:src="@drawable/baseline_get_app_24"
             android:tint="#FFC107"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="8dp"/>

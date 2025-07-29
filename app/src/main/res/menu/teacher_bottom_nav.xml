@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/ic_home"
+        android:title="Home" />
+
+    <item
+        android:id="@+id/nav_assignment"
+        android:icon="@drawable/ic_assignment"
+        android:title="Assignments" />
+
+    <item
+        android:id="@+id/nav_materials"
+        android:icon="@drawable/ic_materials"
+        android:title="Materials" />
+
+    <item
+        android:id="@+id/nav_result"
+        android:icon="@drawable/ic_result"
+        android:title="Results" />
+
+    <item
+        android:id="@+id/nav_qr"
+        android:icon="@drawable/ic_qr_code"
+        android:title="QR Scanner" />
+
+</menu>
+

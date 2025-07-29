@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <ImageView
+            android:id="@+id/ivStudentPhoto"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/circle_background"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_person_placeholder" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvStudentName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="John Doe"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_color_primary" />
+
+            <TextView
+                android:id="@+id/tvStudentId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ID: STU001"
+                android:textSize="12sp"
+                android:textColor="@color/text_color_secondary"
+                android:layout_marginTop="2dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp">
+
+                <TextView
+                    android:id="@+id/tvStudentGrade"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Grade: 10"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_color_secondary" />
+
+                <TextView
+                    android:id="@+id/tvRegistrationDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Registered: 2023-01-15"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_color_secondary"
+                    android:layout_marginStart="16dp" />
+
+                <TextView
+                    android:id="@+id/tvClassCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3 Classes"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_color_secondary"
+                    android:layout_marginStart="16dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/btnViewDetails"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_visibility"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="View Details" />
+
+            <ImageButton
+                android:id="@+id/btnMakePayment"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_payment"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Make Payment"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

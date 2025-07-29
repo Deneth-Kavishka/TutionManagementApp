@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.project.tuitionmanagementapp.R
@@ -23,6 +24,7 @@ class TeacherMaterialsActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var fabUpload: com.google.android.material.floatingactionbutton.FloatingActionButton
     private lateinit var progressBar: ProgressBar
+    private lateinit var bottomNavigation: BottomNavigationView
     private lateinit var adapter: MaterialsAdapter
     private var materialsList = ArrayList<MaterialModel>()
 
@@ -33,6 +35,7 @@ class TeacherMaterialsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_teacher_materials)
 
         initializeViews()
+        setupBottomNavigation()
         setupRecyclerView()
         loadMaterials()
         setupFilePickerLauncher()
@@ -44,9 +47,40 @@ class TeacherMaterialsActivity : AppCompatActivity() {
         fabUpload = findViewById(R.id.fabUploadMaterial)
         progressBar = findViewById(R.id.progressBar)
         recyclerView = findViewById(R.id.rvMaterials)
+        bottomNavigation = findViewById(R.id.bottomNavigation)
 
         findViewById<ImageView>(R.id.backButton).setOnClickListener { finish() }
         fabUpload.setOnClickListener { showUploadDialog() }
+    }
+
+    private fun setupBottomNavigation() {
+        bottomNavigation.selectedItemId = R.id.nav_materials
+        bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> {
+                    startActivity(Intent(this, TeacherDashboardActivity::class.java))
+                    finish()
+                    true
+                }
+                R.id.nav_assignment -> {
+                    startActivity(Intent(this, AssignmentActivity::class.java))
+                    finish()
+                    true
+                }
+                R.id.nav_materials -> true // Stay on current page
+                R.id.nav_result -> {
+                    startActivity(Intent(this, UploadResultActivity::class.java))
+                    finish()
+                    true
+                }
+                R.id.nav_qr -> {
+                    startActivity(Intent(this, QRAttendanceActivity::class.java))
+                    finish()
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     private fun setupRecyclerView() {
@@ -78,13 +112,13 @@ class TeacherMaterialsActivity : AppCompatActivity() {
                     val material = document.toObject(MaterialModel::class.java)
                     materialsList.add(material)
                 }
-                materialsList.sortByDescending { material: MaterialModel -> material.uploadDate }
+                materialsList.sortByDescending { it.uploadDate }
                 adapter.notifyDataSetChanged()
                 progressBar.visibility = View.GONE
             }
             .addOnFailureListener {
-                progressBar.visibility = View.GONE
                 Toast.makeText(this, "Failed to load materials", Toast.LENGTH_SHORT).show()
+                progressBar.visibility = View.GONE
             }
     }
 
@@ -121,7 +155,8 @@ class TeacherMaterialsActivity : AppCompatActivity() {
             title = title,
             url = url,
             uploadDate = System.currentTimeMillis(),
-            type = if (url.endsWith(".pdf", true)) "PDF" else "Document"
+            type = getFileType(url),
+            fileUrl = url
         )
 
         firestore.collection("materials")
@@ -131,13 +166,24 @@ class TeacherMaterialsActivity : AppCompatActivity() {
                 progressBar.visibility = View.GONE
                 loadMaterials() // Refresh the list
             }
-            .addOnFailureListener {
-                showUploadError()
+            .addOnFailureListener { exception ->
+                Toast.makeText(this, "Failed to upload material: ${exception.message}", Toast.LENGTH_SHORT).show()
+                progressBar.visibility = View.GONE
             }
+    }
+
+    private fun getFileType(url: String): String {
+        return when {
+            url.endsWith(".pdf", true) -> "PDF"
+            url.endsWith(".doc", true) || url.endsWith(".docx", true) -> "Document"
+            url.endsWith(".mp4", true) || url.endsWith(".avi", true) -> "Video"
+            url.endsWith(".jpg", true) || url.endsWith(".png", true) -> "Image"
+            else -> "Document"
+        }
     }
 
     private fun showUploadError() {
         progressBar.visibility = View.GONE
-        Toast.makeText(this, "Failed to upload material", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Failed to upload material. Please try again.", Toast.LENGTH_SHORT).show()
     }
 }

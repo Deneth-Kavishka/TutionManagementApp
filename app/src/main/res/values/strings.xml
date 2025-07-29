@@ -1,6 +1,5 @@
 <resources>
 
-
     <string name="app_name">ACADEMIX</string>
     <string name="navigation_drawer_open">Open Navigation Drawer</string>
     <string name="navigation_drawer_close">Close Navigation Drawer</string>
@@ -56,4 +55,54 @@
     <string name="nic_format_error">Invalid NIC format (9-12 digits, optionally ending with V or X)</string>
     <string name="select_role_prompt">Please select a role</string>
     <string name="accept_terms">Please accept the Terms and Conditions</string>
+
+    <!-- Admin QR Scanner Strings -->
+    <string name="student_id_format">ID: %1$s</string>
+    <string name="not_provided">Not provided</string>
+    <string name="not_specified">Not specified</string>
+    <string name="currency_format">Rs. %1$s</string>
+    <string name="no_payment_record">No payment record</string>
+
+    <!-- Payment Status Strings -->
+    <string name="status_paid">✅ PAID</string>
+    <string name="status_pending">⚠️ PENDING</string>
+    <string name="status_overdue">❌ OVERDUE</string>
+    <string name="status_unknown">ℹ️ UNKNOWN</string>
+    <string name="no_pending_amount">No pending amount</string>
+    <string name="outstanding_amount">Outstanding: Rs. %1$s</string>
+    <string name="overdue_amount">Overdue: Rs. %1$s</string>
+    <string name="status_unknown_desc">Status unknown</string>
+
+    <!-- Button Strings -->
+    <string name="payment_up_to_date">Payment Up to Date</string>
+    <string name="process_payment">Process Payment</string>
+    <string name="pay_overdue_amount">Pay Overdue Amount</string>
+    <string name="set_payment_status">Set Payment Status</string>
+
+    <!-- Payment Dialog Strings -->
+    <string name="pending_format">Pending: Rs. %1$s</string>
+    <string name="monthly_fee_format">Monthly Fee: Rs. %1$s</string>
+    <string name="enter_valid_amount">Please enter a valid payment amount</string>
+
+    <!-- Payment Success/Error Strings -->
+    <string name="payment_success">✅ Payment of Rs. %1$s processed successfully for %2$s</string>
+    <string name="payment_failed">❌ Payment processing failed: %1$s</string>
+
+    <!-- Receipt Strings -->
+    <string name="payment_receipt">Payment Receipt</string>
+    <string name="receipt_id_format">Receipt #: %1$s</string>
+    <string name="student_name_format">Student: %1$s</string>
+    <string name="amount_format">Amount: Rs. %1$s</string>
+    <string name="payment_method_format">Payment Method: %1$s</string>
+    <string name="date_time_format">Date &amp; Time: %1$s</string>
+    <string name="share_receipt">Share Receipt</string>
+    <string name="print_feature_coming_soon">Print functionality will be implemented</string>
+
+    <!-- Receipt Share Format -->
+    <string name="receipt_share_format">Payment Receipt\nReceipt #: %1$s\nStudent: %2$s\nAmount: Rs. %3$s\nPayment Method: %4$s\nDate &amp; Time: %5$s\n\nThank you for your payment!</string>
+
+    <!-- Future Features -->
+    <string name="edit_student_coming_soon">Edit student feature coming soon</string>
+    <string name="student_history_coming_soon">Student history feature coming soon</string>
+
 </resources>

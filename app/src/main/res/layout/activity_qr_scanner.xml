@@ -1,29 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black">
-
-    <!-- Camera Preview Surface -->
-    <SurfaceView
-        android:id="@+id/surfaceView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <!-- Overlay for QR scanning frame -->
-    <View
-        android:id="@+id/overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/qr_scanner_overlay" />
+    android:orientation="vertical"
+    android:background="#000000">
 
     <!-- Top toolbar -->
     <LinearLayout
         android:id="@+id/topToolbar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="@color/black"
+        android:background="#471396"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:paddingHorizontal="16dp">
@@ -33,7 +21,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_arrow_back"
-            android:tint="@color/white"
+            android:tint="#FFFFFF"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="4dp" />
 
@@ -41,8 +29,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="QR Scanner"
-            android:textColor="@color/white"
+            android:text="QR Attendance Scanner"
+            android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold"
             android:gravity="center" />
@@ -52,76 +40,78 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/ic_flashlight_off"
-            android:tint="@color/white"
+            android:tint="#FFFFFF"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="4dp" />
+
     </LinearLayout>
 
-    <!-- Bottom instruction panel -->
-    <LinearLayout
-        android:id="@+id/bottomPanel"
+    <!-- Scanner instruction -->
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@color/black"
-        android:orientation="vertical"
-        android:padding="24dp"
-        android:gravity="center">
+        android:text="Position the QR code within the scanning area"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:padding="16dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Scan Student QR Code"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:gravity="center" />
+    <!-- Camera preview container -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_margin="16dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Position the QR code within the frame to scan"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:gravity="center"
-            android:alpha="0.8" />
+        <!-- Camera surface view -->
+        <SurfaceView
+            android:id="@+id/surfaceView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-    </LinearLayout>
+        <!-- Scanner overlay -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <!-- Add these inside your RelativeLayout -->
-    <!-- Scanning frame border -->
-    <View
-        android:id="@+id/scanFrame"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:layout_centerInParent="true"
-        android:background="@drawable/scan_frame_border" />
+            <!-- Scanner frame -->
+            <View
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:layout_gravity="center"
+                android:background="@drawable/scanner_frame" />
 
-    <!-- Scanning line animation -->
-    <View
-        android:id="@+id/scanLine"
-        android:layout_width="250dp"
-        android:layout_height="2dp"
-        android:layout_centerHorizontal="true"
-        android:background="@color/colorPrimary"
-        android:visibility="invisible" />
+            <!-- Scanning line -->
+            <View
+                android:id="@+id/scanLine"
+                android:layout_width="240dp"
+                android:layout_height="2dp"
+                android:layout_gravity="center"
+                android:background="#00FF00"
+                android:alpha="0.8" />
 
-    <!-- Add the focus indicator view -->
-    <View
-        android:id="@+id/focusIndicator"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_centerInParent="true"
-        android:visibility="invisible" />
+            <!-- Success feedback -->
+            <ImageView
+                android:id="@+id/scanSuccess"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_check_circle"
+                android:tint="#00FF00"
+                android:visibility="gone" />
 
-    <!-- Success feedback -->
-    <ImageView
-        android:id="@+id/scanSuccess"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_centerInParent="true"
-        android:src="@drawable/ic_check_circle"
-        android:visibility="invisible" />
+        </FrameLayout>
 
-</RelativeLayout>
+    </FrameLayout>
+
+    <!-- Instructions -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hold your device steady and ensure the QR code is well lit"
+        android:textColor="#CCCCCC"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:padding="16dp" />
+
+</LinearLayout>

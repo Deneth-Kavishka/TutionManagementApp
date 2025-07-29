@@ -508,6 +508,10 @@
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FFFFFF"
+        android:background="#471396"
+        app:itemIconTint="@color/yellow"
+        app:itemTextColor="#FFFFFF"
+        app:itemRippleColor="#FFC107"
+        app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu_teacher" />
 </LinearLayout>

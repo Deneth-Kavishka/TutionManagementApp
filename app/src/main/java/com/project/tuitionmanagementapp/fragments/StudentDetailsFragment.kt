@@ -89,16 +89,16 @@ class StudentDetailsFragment : Fragment() {
 
     private fun updateUI() {
         student?.let { student ->
-            tvEmail.text = student.email
-            tvPhone.text = student.phone
+            tvEmail.text = student.studentEmail
+            tvPhone.text = student.studentPhone
             tvAddress.text = student.address
             tvDateOfBirth.text = student.dateOfBirth
             tvGender.text = student.gender
-            tvRollNumber.text = student.rollNumber
+            tvRollNumber.text = student.studentId
             tvAdmissionDate.text = student.admissionDate
-            tvParentName.text = student.parentName
-            tvParentPhone.text = student.parentPhone
-            tvParentEmail.text = student.parentEmail
+            tvParentName.text = student.guardianName
+            tvParentPhone.text = student.guardianPhone
+            tvParentEmail.text = student.guardianEmail
             tvTotalFees.text = "$${student.totalFees}"
             tvPaidAmount.text = "$${student.paidAmount}"
             tvPendingAmount.text = "$${student.pendingAmount}"

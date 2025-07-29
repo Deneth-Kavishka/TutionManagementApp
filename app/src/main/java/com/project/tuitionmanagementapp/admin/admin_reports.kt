@@ -1,126 +1,140 @@
 package com.project.tuitionmanagementapp.admin
 
-import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.DatePicker
-import android.widget.LinearLayout
+import android.widget.*
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.project.tuitionmanagementapp.R
+import java.text.SimpleDateFormat
+import java.util.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [admin_reports.newInstance] factory method to
- * create an instance of this fragment.
- */
 class admin_reports : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private val reportsList = mutableListOf(
+        "Monthly Revenue Report - December 2024",
+        "Student Attendance Report - Week 50",
+        "Teacher Performance Report - Q4 2024",
+        "Payment Status Report - Current Month",
+        "Class Enrollment Report - 2024"
+    )
+
+    private val reportTypes = arrayOf(
+        "Revenue Report",
+        "Attendance Report",
+        "Student Performance Report",
+        "Teacher Performance Report",
+        "Payment Status Report"
+    )
+
+    private val classList = arrayOf(
+        "Grade 10 Mathematics",
+        "Grade 9 Science",
+        "Grade 11 Physics",
+        "Grade 8 English",
+        "A/L Biology"
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_admin_reports, container, false)
     }
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?){
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //view all reports
-        val viewAllReports: Button = view.findViewById(R.id.viewAllReports)
-        viewAllReports.setOnClickListener {
-            val intent = Intent(activity, AllReports::class.java)
-            startActivity(intent)
-        }
-        //start date
-        val datePickerStart = Dialog(requireContext())
-        datePickerStart.setContentView(R.layout.picker_start_date)
-        //end date
-        val datePickerEnd = Dialog(requireContext())
-        datePickerEnd.setContentView(R.layout.picker_end_date)
 
-        val getDateStart: Button = view.findViewById(R.id.DateShowStart)//button 1 (start date)
-        val dateUIStart: DatePicker = datePickerStart.findViewById(R.id.datePickerStart)//date ui/ start
-        val dateActionBtnStart: Button = datePickerStart.findViewById(R.id.setDateStart)//date select btn/end
+        setupReportDropdowns(view)
+        setupDateButtons(view)
+        setupActionButtons(view)
+    }
 
-        val getDateEnd: Button = view.findViewById(R.id.DateShowEnd)//button 2 (end date)
-        val dateUIEnd: DatePicker = datePickerEnd.findViewById(R.id.datePickerEnd)//date ui/ end
-        val dateActionBtnEnd: Button = datePickerEnd.findViewById(R.id.setDateEnd)//date select btn/end
+    private fun setupReportDropdowns(view: View) {
+        // Setup report type dropdown
+        val reportTypeAutoComplete = view.findViewById<AutoCompleteTextView>(R.id.autoCompleteReportType)
+        val reportTypeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, reportTypes)
+        reportTypeAutoComplete.setAdapter(reportTypeAdapter)
 
-        //start action
-        getDateStart.setOnClickListener {
-            datePickerStart.window?.setLayout(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            datePickerStart.setCancelable(false)
-            datePickerStart.show()
+        // Setup class dropdown
+        val classAutoComplete = view.findViewById<AutoCompleteTextView>(R.id.autoCompleteClass)
+        val classAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, classList)
+        classAutoComplete.setAdapter(classAdapter)
+    }
+
+    private fun setupDateButtons(view: View) {
+        // Set up date selection buttons
+        view.findViewById<Button>(R.id.DateShowStart)?.setOnClickListener {
+            showDatePickerDialog("Start Date")
         }
-        //end action
-        getDateEnd.setOnClickListener {
-            datePickerEnd.window?.setLayout(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            datePickerEnd.setCancelable(false)
-            datePickerEnd.show()
-        }
-        //start (popup)
-        dateActionBtnStart.setOnClickListener {
-            with(dateUIStart){
-                val day = dayOfMonth
-                val month = month
-                val year = year
-                getDateStart.text = "$day/$month/$year"
-            }
-            datePickerStart.dismiss()
-        }
-        //end(popup)
-        dateActionBtnEnd.setOnClickListener {
-            with(dateUIEnd){
-                val day = dayOfMonth
-                val month = month
-                val year = year
-                getDateEnd.text = "$day/$month/$year"
-            }
-            datePickerEnd.dismiss()
+
+        view.findViewById<Button>(R.id.DateShowEnd)?.setOnClickListener {
+            showDatePickerDialog("End Date")
         }
     }
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment admin_reports.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            admin_reports().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+
+    private fun setupActionButtons(view: View) {
+        // Generate report button
+        view.findViewById<Button>(R.id.btnAddStudent)?.setOnClickListener {
+            generateReport()
+        }
+
+        // View all reports button
+        view.findViewById<Button>(R.id.viewAllReports)?.setOnClickListener {
+            try {
+                val intent = Intent(activity, AllReports::class.java)
+                startActivity(intent)
+            } catch (e: Exception) {
+                Toast.makeText(context, "All reports feature coming soon", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun showDatePickerDialog(title: String) {
+        Toast.makeText(context, "$title picker will be implemented", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun generateReport() {
+        val reportType = view?.findViewById<AutoCompleteTextView>(R.id.autoCompleteReportType)?.text.toString()
+        val selectedClass = view?.findViewById<AutoCompleteTextView>(R.id.autoCompleteClass)?.text.toString()
+
+        if (reportType.isEmpty() || selectedClass.isEmpty()) {
+            Toast.makeText(context, "Please select report type and class", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val newReport = "$reportType for $selectedClass - ${getCurrentDate()}"
+        reportsList.add(0, newReport)
+        Toast.makeText(context, "Report generated successfully", Toast.LENGTH_SHORT).show()
+
+        // Show dialog with generated report info
+        showReportDetailsDialog(newReport)
+    }
+
+    private fun showReportDetailsDialog(report: String) {
+        val options = arrayOf("View", "Download", "Delete")
+
+        val builder = android.app.AlertDialog.Builder(requireContext())
+        builder.setTitle(report)
+        builder.setItems(options) { _, which ->
+            when (which) {
+                0 -> Toast.makeText(context, "Opening report: $report", Toast.LENGTH_SHORT).show()
+                1 -> Toast.makeText(context, "Downloading report: $report", Toast.LENGTH_SHORT).show()
+                2 -> {
+                    reportsList.remove(report)
+                    Toast.makeText(context, "Report deleted", Toast.LENGTH_SHORT).show()
                 }
             }
+        }
+        builder.show()
+    }
+
+
+    private fun getCurrentDate(): String {
+        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        return sdf.format(Date())
     }
 }

@@ -1,21 +1,23 @@
 package com.project.tuitionmanagementapp.teacher
 
+import android.app.Dialog
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
+import android.view.Window
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import androidx.core.content.edit
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.project.tuitionmanagementapp.R
 import com.project.tuitionmanagementapp.auth.LoginActivity
-import java.text.SimpleDateFormat
 import java.util.*
 
 class TeacherDashboardActivity : AppCompatActivity() {
@@ -53,20 +55,19 @@ class TeacherDashboardActivity : AppCompatActivity() {
         imgOptions = findViewById(R.id.imgOptions)
         tvTeacherName = findViewById(R.id.tvTeacherName)
 
-        // Find CardViews for each action
-        // Using findViewById with null-safe calls and finding parent CardView instead of LinearLayout
+        // Find CardViews for each action - Connect ALL your created features
         val attendanceCard = findViewById<CardView>(R.id.attendanceCard)
         val materialsCard = findViewById<CardView>(R.id.materialsCard)
         val assignmentsCard = findViewById<CardView>(R.id.assignmentsCard)
         val resultsCard = findViewById<CardView>(R.id.resultsCard)
 
-        // Set click listeners with null checks
+        // Set click listeners to connect ALL your created activities
         attendanceCard?.setOnClickListener { navigateToAttendance() }
         materialsCard?.setOnClickListener { navigateToMaterials() }
         assignmentsCard?.setOnClickListener { navigateToAssignments() }
         resultsCard?.setOnClickListener { navigateToResults() }
 
-        // Try to find the bottom navigation if it exists
+        // Initialize bottom navigation
         bottomNavigationView = findViewById(R.id.bottomNavigation)
     }
 
@@ -83,12 +84,11 @@ class TeacherDashboardActivity : AppCompatActivity() {
                         currentTeacherName = document.getString("name") ?: "Teacher"
                         updateUI()
 
-                        // Store in SharedPreferences
-                        with(sharedPreferences.edit()) {
+                        // Store in SharedPreferences using KTX extension
+                        sharedPreferences.edit {
                             putString("teacher_id", currentTeacherId)
                             putString("teacher_name", currentTeacherName)
                             putString("teacher_email", currentTeacherEmail)
-                            apply()
                         }
                     }
                 }
@@ -102,10 +102,8 @@ class TeacherDashboardActivity : AppCompatActivity() {
         // Update teacher name
         tvTeacherName.text = currentTeacherName ?: "Teacher"
 
-        // Note: welcomeText is used instead of tvGreeting
-        val welcomeText = findViewById<TextView>(R.id.welcomeText)
-
         // Update greeting based on time of day
+        val welcomeText = findViewById<TextView>(R.id.welcomeText)
         val calendar = Calendar.getInstance()
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
         val greeting = when {
@@ -113,7 +111,6 @@ class TeacherDashboardActivity : AppCompatActivity() {
             hour < 17 -> "Good Afternoon,"
             else -> "Good Evening,"
         }
-
         welcomeText?.text = greeting
     }
 
@@ -121,18 +118,25 @@ class TeacherDashboardActivity : AppCompatActivity() {
         bottomNavigationView.selectedItemId = R.id.nav_home
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home -> true
+                R.id.nav_home -> {
+                    // Stay on home
+                    true
+                }
                 R.id.nav_assignment -> {
                     navigateToAssignments()
-                    true
+                    false
                 }
                 R.id.nav_materials -> {
                     navigateToMaterials()
-                    true
+                    false
                 }
-                R.id.nav_profile -> {
-                    navigateToProfile()
-                    true
+                R.id.nav_result -> {
+                    navigateToResults()
+                    false
+                }
+                R.id.nav_qr -> {
+                    navigateToQRScanner()
+                    false
                 }
                 else -> false
             }
@@ -150,7 +154,7 @@ class TeacherDashboardActivity : AppCompatActivity() {
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.menu_edit_profile -> {
-                    startActivity(Intent(this, EditProfileActivity::class.java))
+                    navigateToProfile()
                     true
                 }
                 R.id.menu_settings -> {
@@ -184,6 +188,14 @@ class TeacherDashboardActivity : AppCompatActivity() {
                     Toast.makeText(this, "About Academix", Toast.LENGTH_SHORT).show()
                     true
                 }
+                R.id.menu_analytics -> {
+                    navigateToAnalytics()
+                    true
+                }
+                R.id.menu_calendar -> {
+                    navigateToCalendar()
+                    true
+                }
                 else -> false
             }
         }
@@ -191,40 +203,108 @@ class TeacherDashboardActivity : AppCompatActivity() {
     }
 
     private fun navigateToAttendance() {
-        // Show options for attendance - QR Scanner or Manual Entry
-        val options = arrayOf("QR Code Scanner", "View Attendance Records")
-        android.app.AlertDialog.Builder(this)
-            .setTitle("Attendance Options")
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> startActivity(Intent(this, QRAttendanceActivity::class.java))
-                    1 -> startActivity(Intent(this, AttendanceFragment::class.java))
-                }
-            }
-            .show()
+        showAttendanceOptionsDialog()
     }
 
-    private fun navigateToAssignments() = startActivity(Intent(this, AssignmentActivity::class.java))
-    private fun navigateToMaterials() = startActivity(Intent(this, TeacherMaterialsActivity::class.java))
-    private fun navigateToResults() = startActivity(Intent(this, UploadResultActivity::class.java))
+    private fun showAttendanceOptionsDialog() {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.dialog_attendance_options)
+        dialog.setCancelable(true)
 
-    // These activities don't exist yet, so let's show a Toast instead
+        // Find views in dialog
+        val btnCloseDialog = dialog.findViewById<ImageView>(R.id.btnCloseDialog)
+        val cardQRScanner = dialog.findViewById<CardView>(R.id.cardQRScanner)
+        val cardViewRecords = dialog.findViewById<CardView>(R.id.cardViewRecords)
+
+        // Set click listeners
+        btnCloseDialog.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        cardQRScanner.setOnClickListener {
+            dialog.dismiss()
+            try {
+                startActivity(Intent(this, QRAttendanceActivity::class.java))
+            } catch (e: Exception) {
+                Toast.makeText(this, "QR Scanner not available: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        cardViewRecords.setOnClickListener {
+            dialog.dismiss()
+            try {
+                startActivity(Intent(this, AttendanceRecordsActivity::class.java))
+            } catch (e: Exception) {
+                Toast.makeText(this, "Attendance Records not available: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        dialog.show()
+    }
+
+    private fun navigateToAssignments() {
+        try {
+            startActivity(Intent(this, AssignmentActivity::class.java))
+        } catch (_: Exception) {
+            Toast.makeText(this, "Assignment feature is not available", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun navigateToMaterials() {
+        try {
+            startActivity(Intent(this, TeacherMaterialsManagementActivity::class.java))
+        } catch (_: Exception) {
+            Toast.makeText(this, "Materials feature is not available", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun navigateToResults() {
+        try {
+            startActivity(Intent(this, UploadResultActivity::class.java))
+        } catch (_: Exception) {
+            Toast.makeText(this, "Results feature is not available", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun navigateToQRScanner() {
+        try {
+            startActivity(Intent(this, QRAttendanceActivity::class.java))
+        } catch (_: Exception) {
+            Toast.makeText(this, "QR Scanner feature is not available", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun navigateToProfile() {
+        try {
+            startActivity(Intent(this, EditProfileActivity::class.java))
+        } catch (_: Exception) {
+            Toast.makeText(this, "Profile feature is not available", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun navigateToAnalytics() {
-        Toast.makeText(this, "Analytics feature coming soon", Toast.LENGTH_SHORT).show()
+        try {
+            startActivity(Intent(this, AnalyticsActivity::class.java))
+        } catch (_: Exception) {
+            Toast.makeText(this, "Analytics feature is not available", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun navigateToCalendar() {
-        Toast.makeText(this, "Calendar feature coming soon", Toast.LENGTH_SHORT).show()
+        try {
+            startActivity(Intent(this, CalendarActivity::class.java))
+        } catch (_: Exception) {
+            Toast.makeText(this, "Calendar feature is not available", Toast.LENGTH_SHORT).show()
+        }
     }
-
-    private fun navigateToProfile() = startActivity(Intent(this, EditProfileActivity::class.java))
 
     private fun logoutTeacher() {
         android.app.AlertDialog.Builder(this)
             .setTitle("Logout")
             .setMessage("Are you sure you want to logout?")
             .setPositiveButton("Yes") { _, _ ->
-                sharedPreferences.edit().clear().apply()
+                sharedPreferences.edit { clear() }
                 auth.signOut()
                 startActivity(Intent(this, LoginActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -238,5 +318,7 @@ class TeacherDashboardActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         loadTeacherData()
+        // Reset bottom navigation to home when returning to dashboard
+        bottomNavigationView.selectedItemId = R.id.nav_home
     }
 }

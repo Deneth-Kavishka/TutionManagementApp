@@ -7,7 +7,8 @@ import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import com.google.firebase.database.FirebaseDatabase
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.project.tuitionmanagementapp.R
 import java.util.*
@@ -21,6 +22,7 @@ class AssignmentActivity : AppCompatActivity() {
     private lateinit var btnChooseFile: Button
     private lateinit var tvFileName: TextView
     private lateinit var btnUpload: Button
+    private lateinit var bottomNavigation: BottomNavigationView
 
     private var selectedFileUri: Uri? = null
     private val PICK_PDF_REQUEST = 1001
@@ -37,6 +39,12 @@ class AssignmentActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "Upload Assignment"
 
+        initViews()
+        setupBottomNavigation()
+        setupClickListeners()
+    }
+
+    private fun initViews() {
         // View bindings
         etTitle = findViewById(R.id.etAssignmentTitle)
         spinnerGrade = findViewById(R.id.spinnerGrade)
@@ -45,11 +53,44 @@ class AssignmentActivity : AppCompatActivity() {
         btnChooseFile = findViewById(R.id.btnChooseFile)
         tvFileName = findViewById(R.id.tvFileName)
         btnUpload = findViewById(R.id.btnUploadAssignment)
+        bottomNavigation = findViewById(R.id.bottomNavigation)
 
         // Spinner data
         val grades = listOf("Select Grade", "Grade 6", "Grade 7", "Grade 8", "Grade 9", "Grade 10")
         spinnerGrade.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, grades)
+    }
 
+    private fun setupBottomNavigation() {
+        bottomNavigation.selectedItemId = R.id.nav_assignment
+        bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> {
+                    startActivity(Intent(this, TeacherDashboardActivity::class.java))
+                    finish()
+                    true
+                }
+                R.id.nav_assignment -> true // Stay on current page
+                R.id.nav_materials -> {
+                    startActivity(Intent(this, TeacherMaterialsManagementActivity::class.java))
+                    finish()
+                    true
+                }
+                R.id.nav_result -> {
+                    startActivity(Intent(this, UploadResultActivity::class.java))
+                    finish()
+                    true
+                }
+                R.id.nav_qr -> {
+                    startActivity(Intent(this, QRAttendanceActivity::class.java))
+                    finish()
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+    private fun setupClickListeners() {
         // Date picker
         etSubmissionDate.setOnClickListener {
             val calendar = Calendar.getInstance()
@@ -118,28 +159,29 @@ class AssignmentActivity : AppCompatActivity() {
             .addOnSuccessListener {
                 // Get download URL
                 storageRef.downloadUrl.addOnSuccessListener { uri ->
-                    // Create assignment object
-                    val assignmentMap = HashMap<String, Any>()
-                    assignmentMap["title"] = title
-                    assignmentMap["grade"] = grade
-                    assignmentMap["submissionDate"] = selectedDate
-                    assignmentMap["submissionTime"] = selectedTime
-                    assignmentMap["fileUrl"] = uri.toString()
-                    assignmentMap["timestamp"] = timestamp
+                    // Create assignment object for Firestore
+                    val assignmentData = mapOf(
+                        "title" to title,
+                        "grade" to grade,
+                        "submissionDate" to selectedDate,
+                        "submissionTime" to selectedTime,
+                        "fileUrl" to uri.toString(),
+                        "uploadDate" to com.google.firebase.Timestamp.now(),
+                        "teacherId" to com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid,
+                        "status" to "active"
+                    )
 
-                    // Save to database
-                    FirebaseDatabase.getInstance().reference
-                        .child("assignments")
-                        .push()
-                        .setValue(assignmentMap)
-                        .addOnCompleteListener { task ->
+                    // Save to Firestore instead of Realtime Database
+                    FirebaseFirestore.getInstance().collection("assignments")
+                        .add(assignmentData)
+                        .addOnSuccessListener {
                             progressDialog.dismiss()
-                            if (task.isSuccessful) {
-                                Toast.makeText(this, "Assignment uploaded successfully", Toast.LENGTH_SHORT).show()
-                                finish()
-                            } else {
-                                Toast.makeText(this, "Failed to upload assignment: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                            }
+                            Toast.makeText(this, "Assignment uploaded successfully", Toast.LENGTH_SHORT).show()
+                            finish()
+                        }
+                        .addOnFailureListener { exception ->
+                            progressDialog.dismiss()
+                            Toast.makeText(this, "Failed to upload assignment: ${exception.message}", Toast.LENGTH_SHORT).show()
                         }
                 }
             }

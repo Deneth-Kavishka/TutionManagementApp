@@ -22,6 +22,7 @@ class MaterialsAdapter(
         val type: TextView = itemView.findViewById(R.id.tvMaterialType)
         val date: TextView = itemView.findViewById(R.id.tvUploadDate)
         val icon: ImageView = itemView.findViewById(R.id.imgMaterialIcon)
+        val downloadBtn: ImageView = itemView.findViewById(R.id.btnDownload)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MaterialViewHolder {
@@ -33,30 +34,34 @@ class MaterialsAdapter(
     override fun onBindViewHolder(holder: MaterialViewHolder, position: Int) {
         val material = materials[position]
 
-        holder.title.text = material.title
-        holder.type.text = material.type
+        holder.title.text = material.title.ifEmpty { "Untitled Material" }
+        holder.type.text = material.type.ifEmpty { "Document" }
         holder.date.text = formatDate(material.uploadDate)
 
-        // Set icon based on material type
+        // Set icon based on material type using existing drawable resources
         holder.icon.setImageResource(
             when (material.type.lowercase()) {
-                "pdf" -> R.drawable.ic_pdf
-                "video" -> R.drawable.ic_video
-                else -> R.drawable.ic_document
+                "pdf" -> R.drawable.baseline_article_24 // Use existing article icon for PDFs
+                "video" -> R.drawable.baseline_upload_file_24 // Use upload file icon for videos
+                "image" -> R.drawable.baseline_add_box_24 // Use add box icon for images
+                "document" -> R.drawable.baseline_article_24 // Use article icon for documents
+                else -> R.drawable.baseline_article_24 // Default to article icon
             }
         )
 
-        // Set card click listener
+        // Set click listeners
         holder.cardView.setOnClickListener { onItemClick(material) }
-
-        // Apply theme colors
-        holder.icon.setColorFilter(holder.itemView.context.getColor(R.color.purple_700))
+        holder.downloadBtn.setOnClickListener { onItemClick(material) }
     }
 
-    override fun getItemCount() = materials.size
+    override fun getItemCount(): Int = materials.size
 
     private fun formatDate(timestamp: Long): String {
-        val sdf = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-        return sdf.format(Date(timestamp))
+        return if (timestamp > 0) {
+            val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+            dateFormat.format(Date(timestamp))
+        } else {
+            "Unknown date"
+        }
     }
 }

@@ -9,4 +9,7 @@
     <item
         android:id="@+id/manage_admin"
         android:title="Manage Admins" />
+    <item
+        android:id="@+id/admin_logout"
+        android:title="Logout" />
 </menu>

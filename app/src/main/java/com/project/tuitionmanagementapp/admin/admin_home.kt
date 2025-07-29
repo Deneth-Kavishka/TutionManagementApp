@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,30 +47,114 @@ class admin_home : Fragment() {
         setupQuickStats()
         setupRecentActivities()
 
-        // Notification button
-       /* binding.notificationButton.setOnClickListener {
-            startActivity(Intent(requireContext(), Notifications::class.java))
-        }
-*/
-        // Quick action buttons
-        binding.cardAddStudent.setOnClickListener { showAddStudentDialog() }
-        binding.cardAddTeacher.setOnClickListener { showAddTeacherDialog() }
-        binding.cardQrScanner.setOnClickListener {
-            try {
-                val intent = Intent(requireContext(), QRScannerActivity::class.java)
-                startActivity(intent)
-            } catch (e: Exception) {
-                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+        // Notification button - Handle gracefully if not found
+        try {
+            val notificationButton = view.findViewById<View>(R.id.notificationButton)
+            notificationButton?.setOnClickListener {
+                try {
+                    startActivity(Intent(requireContext(), Notifications::class.java))
+                } catch (e: Exception) {
+                    Toast.makeText(context, "Notifications feature will be implemented", Toast.LENGTH_SHORT).show()
+                }
             }
+        } catch (e: Exception) {
+            Log.d("AdminHome", "Notification button not found in layout")
         }
-        binding.cardMakePayment.setOnClickListener { showPaymentDialog() }
-        binding.cardParentPortal.setOnClickListener { openParentPortal() }
-        binding.cardViewStudents.setOnClickListener { showStudentInfoDialog() }
+
+        // Quick action buttons with improved error handling
+        setupQuickActionButtons()
 
         // Refresh data button
-        binding.btnRefresh.setOnClickListener {
-            refreshDashboardData()
-            Toast.makeText(context, "Dashboard refreshed", Toast.LENGTH_SHORT).show()
+        try {
+            binding.btnRefresh.setOnClickListener {
+                refreshDashboardData()
+                Toast.makeText(context, "Dashboard refreshed", Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            Log.d("AdminHome", "Refresh button not found")
+        }
+    }
+
+    private fun setupQuickActionButtons() {
+        try {
+            binding.cardAddStudent.setOnClickListener {
+                try {
+                    Log.d("AdminHome", "Add Student button clicked")
+                    val intent = Intent(requireActivity(), AddStudentActivity::class.java)
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    Log.e("AdminHome", "Error starting AddStudentActivity", e)
+                    Toast.makeText(context, "Add Student feature is currently unavailable: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        } catch (e: Exception) {
+            Log.d("AdminHome", "Add student card not found", e)
+        }
+
+        try {
+            binding.cardAddTeacher.setOnClickListener { 
+                try {
+                    Log.d("AdminHome", "Add Teacher button clicked")
+                    val intent = Intent(requireActivity(), AddTeacherActivity::class.java)
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    Log.e("AdminHome", "Error starting AddTeacherActivity", e)
+                    Toast.makeText(context, "Add Teacher feature is currently unavailable: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        } catch (e: Exception) {
+            Log.d("AdminHome", "Add teacher card not found", e)
+        }
+
+        try {
+            binding.cardQrScanner.setOnClickListener {
+                try {
+                    val intent = Intent(requireContext(), QRScannerActivity::class.java)
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    Toast.makeText(context, "QR Scanner feature will be implemented", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } catch (e: Exception) {
+            Log.d("AdminHome", "QR Scanner card not found")
+        }
+
+        try {
+            binding.cardMakePayment.setOnClickListener {
+                try {
+                    // Launch the correct StudentPaymentActivity
+                    val intent = Intent(requireActivity(), StudentPaymentActivity::class.java)
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    Log.e("AdminHome", "Error starting StudentPaymentActivity", e)
+                    Toast.makeText(context, "Payment feature error: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        } catch (e: Exception) {
+            Log.d("AdminHome", "Make payment card not found")
+        }
+
+        try {
+            binding.cardParentPortal.setOnClickListener { openParentPortal() }
+        } catch (e: Exception) {
+            Log.d("AdminHome", "Parent portal card not found")
+        }
+
+        try {
+            binding.cardViewStudents.setOnClickListener {
+                try {
+                    // Launch the StudentDetailsActivity to view students
+                    val intent = Intent(requireActivity(), StudentDetailsActivity::class.java)
+                    // You can pass a default student ID if needed
+                    intent.putExtra("student_id", "STD001")
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    Log.e("AdminHome", "Error starting StudentDetailsActivity", e)
+                    Toast.makeText(context, "View Students feature error: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        } catch (e: Exception) {
+            Log.d("AdminHome", "View students card not found")
         }
     }
 
@@ -220,29 +305,6 @@ class admin_home : Fragment() {
         }
     }
 
-    private fun showPaymentDialog() {
-        val dialog = BottomSheetDialog(requireContext())
-        val view = layoutInflater.inflate(R.layout.dialog_make_payment, null)
-
-        // Setup payment form
-        val studentSpinner = view.findViewById<AutoCompleteTextView>(R.id.spinnerStudent)
-        val students = arrayOf("Kamal Perera", "Nimali Silva", "Sunil Fernando", "Anusha Rathnayake")
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, students)
-        studentSpinner.setAdapter(adapter)
-
-        view.findViewById<Button>(R.id.btnProcessPayment).setOnClickListener {
-            // Process payment logic
-            Toast.makeText(context, "Payment processed", Toast.LENGTH_SHORT).show()
-            dialog.dismiss()
-        }
-
-        view.findViewById<Button>(R.id.btnCancelPayment).setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialog.setContentView(view)
-        dialog.show()
-    }
 
     private fun openParentPortal() {
         // Implement parent portal functionality

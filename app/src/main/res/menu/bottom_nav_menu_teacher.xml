@@ -7,17 +7,17 @@
     <item
         android:id="@+id/nav_assignment"
         android:icon="@drawable/baseline_upload_file_24"
-        android:title="Assignment" />
+        android:title="Assignments" />
     <item
         android:id="@+id/nav_materials"
-        android:icon="@android:drawable/ic_menu_gallery"
+        android:icon="@drawable/baseline_article_24"
         android:title="Materials" />
     <item
         android:id="@+id/nav_result"
-        android:icon="@drawable/bar_char2"
-        android:title="Result" />
+        android:icon="@drawable/baseline_assessment_24"
+        android:title="Results" />
     <item
-        android:id="@+id/nav_attendance"
+        android:id="@+id/nav_qr"
         android:icon="@drawable/ic_qr_code"
-        android:title="Attendance" />
+        android:title="QR Scanner" />
 </menu>

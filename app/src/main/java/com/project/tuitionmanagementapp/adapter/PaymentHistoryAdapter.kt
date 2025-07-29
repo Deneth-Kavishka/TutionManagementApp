@@ -16,11 +16,11 @@ class PaymentHistoryAdapter(private val payments: List<Payment>) :
     private val dateFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
 
     inner class PaymentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tvAmount: TextView = itemView.findViewById(R.id.tvAmount)
-        val tvDate: TextView = itemView.findViewById(R.id.tvDate)
-        val tvMethod: TextView = itemView.findViewById(R.id.tvMethod)
-        val tvStatus: TextView = itemView.findViewById(R.id.tvStatus)
-        val tvDescription: TextView = itemView.findViewById(R.id.tvDescription)
+        val tvAmount: TextView = itemView.findViewById(R.id.tvPaymentAmount)
+        val tvDate: TextView = itemView.findViewById(R.id.tvPaymentDate)
+        val tvMethod: TextView = itemView.findViewById(R.id.tvPaymentMethod)
+        val tvStatus: TextView = itemView.findViewById(R.id.tvPaymentStatus)
+        val tvReference: TextView = itemView.findViewById(R.id.tvReference)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PaymentViewHolder {
@@ -35,7 +35,14 @@ class PaymentHistoryAdapter(private val payments: List<Payment>) :
         holder.tvAmount.text = "Rs. ${payment.amount}"
         holder.tvDate.text = dateFormat.format(payment.paymentDate)
         holder.tvMethod.text = payment.paymentMethod
-        holder.tvDescription.text = payment.description
+        holder.tvStatus.text = payment.status
+
+        if (payment.referenceNumber.isNotEmpty()) {
+            holder.tvReference.visibility = View.VISIBLE
+            holder.tvReference.text = "Ref: ${payment.referenceNumber}"
+        } else {
+            holder.tvReference.visibility = View.GONE
+        }
 
         holder.tvStatus.text = payment.status
         when (payment.status) {

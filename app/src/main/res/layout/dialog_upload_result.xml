@@ -1,149 +1,210 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="16dp"
-    app:cardCornerRadius="16dp">
+    android:layout_margin="24dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
+        android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Upload Result"
-            android:textColor="#471396"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"/>
-
-        <!-- Student Selection -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
-
-            <AutoCompleteTextView
-                android:id="@+id/spinnerStudent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Select Student"
-                android:inputType="none"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Subject Selection -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
-
-            <AutoCompleteTextView
-                android:id="@+id/spinnerSubject"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Select Subject"
-                android:inputType="none"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Marks Row -->
+        <!-- Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="#471396"
             android:orientation="horizontal"
-            android:layout_marginBottom="16dp">
+            android:padding="16dp"
+            android:gravity="center_vertical">
 
-            <!-- Obtained Marks -->
-            <com.google.android.material.textfield.TextInputLayout
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_upload"
+                android:tint="#FFC107" />
+
+            <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edtMarks"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Marks"
-                    android:inputType="number"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Total Marks -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edtTotalMarks"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Total Marks"
-                    android:inputType="number"
-                    android:text="100"/>
-            </com.google.android.material.textfield.TextInputLayout>
-        </LinearLayout>
-
-        <!-- Grade Display -->
-        <TextView
-            android:id="@+id/tvCalculatedGrade"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Grade: --"
-            android:textColor="#471396"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_gravity="center"
-            android:layout_marginBottom="16dp"/>
-
-        <!-- Comments -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtComment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Comments"
-                android:minLines="2"
-                android:gravity="top"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Action Buttons -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end">
-
-            <Button
-                android:id="@+id/btnCancel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Cancel"
-                android:textColor="#471396"
-                style="@style/Widget.MaterialComponents.Button.TextButton"/>
-
-            <Button
-                android:id="@+id/btnSubmit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Submit"
+                android:layout_marginStart="12dp"
+                android:text="Upload Student Result"
                 android:textColor="#FFFFFF"
-                android:backgroundTint="#471396"
-                android:layout_marginStart="8dp"/>
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
         </LinearLayout>
+
+        <!-- Content -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxHeight="500dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <!-- Step 1: Subject Selection -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Step 1: Select Subject"
+                    android:textColor="#471396"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerSubject"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/rounded_edittext"
+                    android:padding="12dp" />
+
+                <!-- Step 2: Class Selection -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Step 2: Select Class"
+                    android:textColor="#471396"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerClass"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/rounded_edittext"
+                    android:padding="12dp" />
+
+                <!-- Step 3: Student Selection -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Step 3: Select Student"
+                    android:textColor="#471396"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerStudent"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/rounded_edittext"
+                    android:padding="12dp" />
+
+                <!-- Step 4: Result Details -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Step 4: Enter Result Details"
+                    android:textColor="#471396"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Marks Input -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:boxStrokeColor="#471396"
+                    app:hintTextColor="#471396">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etMarks"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Enter Marks (e.g., 85)"
+                        android:inputType="number"
+                        android:maxLength="3" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Grade Input -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:boxStrokeColor="#471396"
+                    app:hintTextColor="#471396">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etGrade"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Enter Grade (e.g., A, B+, C)"
+                        android:inputType="textCapCharacters"
+                        android:maxLength="2" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Comments Input -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    app:boxStrokeColor="#471396"
+                    app:hintTextColor="#471396">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etComments"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Add Comments (Optional)"
+                        android:inputType="textMultiLine"
+                        android:lines="3"
+                        android:maxLines="3"
+                        android:scrollbars="vertical" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Action Buttons -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btnCancel"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:text="Cancel"
+                        android:textColor="#A90505"
+                        android:background="@drawable/button_gray"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/btnUploadResult"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:text="Upload Result"
+                        android:textColor="#FFFFFF"
+                        android:background="@drawable/button_primary"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
+
     </LinearLayout>
+
 </androidx.cardview.widget.CardView>

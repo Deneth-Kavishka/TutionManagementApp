@@ -38,6 +38,25 @@
             </intent-filter>
         </activity>
 
+        <!-- QR Scanner Activities -->
+        <activity
+            android:name=".admin.QRScannerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.TuitionManagementApp" />
+
+        <activity
+            android:name=".teacher.QRAttendanceActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.TuitionManagementApp" />
+
+        <!-- ZXing CaptureActivity for QR Scanning -->
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="portrait"
+            tools:replace="screenOrientation" />
+
         <!-- Dashboard Activities -->
         <activity
             android:name=".student.StudentDashboardActivity"
@@ -69,8 +88,11 @@
         <!-- Teacher Activities -->
         <activity android:name=".teacher.EditProfileActivity" />
         <activity android:name=".teacher.AssignmentActivity" />
-        <activity android:name=".teacher.MaterialsActivity" />
-        <activity android:name=".teacher.AttendanceActivity" />
+       <!-- <activity android:name=".teacher.MaterialsActivity" /> -->
+        <activity android:name=".teacher.TeacherMaterialsManagementActivity" />
+       <!-- <activity android:name=".teacher.AttendanceActivity" /> -->
+        <activity android:name=".teacher.AttendanceRecordsActivity" />
+        <activity android:name=".teacher.AttendanceDetailActivity" />
         <activity android:name=".teacher.UploadResultActivity" />
         <activity android:name=".teacher.AnalyticsActivity" />
         <activity android:name=".teacher.CalendarActivity" />
@@ -80,10 +102,28 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
         <!-- Admin Activities -->
-        <activity
-            android:name=".admin.QRScannerActivity"
+        <activity android:name=".admin.AddStudentActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+        <activity android:name=".admin.AddTeacherActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity android:name=".admin.StudentAssignmentActivity" />
+        <activity android:name=".admin.ClassCalender" />
+        <activity android:name=".admin.AllReports" />
+        <activity android:name=".admin.AllClasses" />
+        <activity android:name=".admin.StudentDetailsActivity" />
+        <activity
+            android:name=".admin.StudentPaymentActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".admin.AdminAccountActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".admin.ManageClassCategoriesActivity"
+            android:exported="false" />
 
     </application>
 </manifest>

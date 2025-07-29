@@ -17,79 +17,112 @@ object StudentRepository {
     }
 
     private fun initializeMockData() {
-        // Sample students
+        // Sample students using the enhanced Student model
         students.addAll(listOf(
             Student(
                 id = "STD001",
-                name = "John Doe",
-                className = "Grade 10-A",
-                grade = "10",
-                section = "A",
-                rollNumber = "101",
+                firstName = "John",
+                lastName = "Doe",
                 dateOfBirth = "2008-05-15",
                 gender = "Male",
-                email = "john.doe@email.com",
-                phone = "123-456-7890",
+                nicNumber = "",
+                studentPhone = "123-456-7890",
+                studentEmail = "john.doe@email.com",
                 address = "123 Main St, City",
-                parentName = "Robert Doe",
-                parentPhone = "987-654-3210",
-                parentEmail = "robert.doe@email.com",
+                city = "Colombo",
+                studentId = "STU001",
+                classCategories = listOf("MATH_10", "SCI_10"),
+                currentGrade = "Grade 10",
                 admissionDate = "2023-01-15",
-                photoUrl = "",
-                attendanceRate = 92,
-                paymentStatus = "PAID",
-                gradeAverage = "A-",
+                guardianName = "Robert Doe",
+                guardianPhone = "987-654-3210",
+                guardianEmail = "robert.doe@email.com",
+                guardianAddress = "123 Main St, City",
                 totalFees = 5000.0,
                 paidAmount = 5000.0,
-                pendingAmount = 0.0
+                pendingAmount = 0.0,
+                paymentStatus = "PAID",
+                attendanceRate = 92.0,
+                gradeAverage = 85.5,
+                photoUrl = "",
+                medicalConditions = "",
+                notes = "",
+                studentUserId = "auth_user_001",
+                guardianUserId = "auth_guardian_001",
+                isActive = true,
+                registrationDate = "2023-01-15 10:00:00",
+                lastUpdated = "2023-01-15 10:00:00",
+                registeredBy = "Admin"
             ),
             Student(
                 id = "STD002",
-                name = "Jane Smith",
-                className = "Grade 9-B",
-                grade = "9",
-                section = "B",
-                rollNumber = "202",
-                dateOfBirth = "2009-08-22",
+                firstName = "Jane",
+                lastName = "Smith",
+                dateOfBirth = "2009-03-22",
                 gender = "Female",
-                email = "jane.smith@email.com",
-                phone = "123-456-7891",
-                address = "456 Oak St, City",
-                parentName = "Mary Smith",
-                parentPhone = "987-654-3211",
-                parentEmail = "mary.smith@email.com",
-                admissionDate = "2023-01-15",
-                photoUrl = "",
-                attendanceRate = 85,
-                paymentStatus = "PENDING",
-                gradeAverage = "B+",
+                nicNumber = "",
+                studentPhone = "123-456-7891",
+                studentEmail = "jane.smith@email.com",
+                address = "456 Oak Ave, City",
+                city = "Kandy",
+                studentId = "STU002",
+                classCategories = listOf("ENG_9", "MATH_9"),
+                currentGrade = "Grade 9",
+                admissionDate = "2023-02-01",
+                guardianName = "Mary Smith",
+                guardianPhone = "987-654-3211",
+                guardianEmail = "mary.smith@email.com",
+                guardianAddress = "456 Oak Ave, City",
                 totalFees = 4500.0,
                 paidAmount = 3000.0,
-                pendingAmount = 1500.0
+                pendingAmount = 1500.0,
+                paymentStatus = "PENDING",
+                attendanceRate = 88.0,
+                gradeAverage = 78.2,
+                photoUrl = "",
+                medicalConditions = "",
+                notes = "",
+                studentUserId = "auth_user_002",
+                guardianUserId = "auth_guardian_002",
+                isActive = true,
+                registrationDate = "2023-02-01 09:30:00",
+                lastUpdated = "2023-02-01 09:30:00",
+                registeredBy = "Admin"
             ),
             Student(
                 id = "STD003",
-                name = "Mike Johnson",
-                className = "Grade 11-A",
-                grade = "11",
-                section = "A",
-                rollNumber = "303",
+                firstName = "Mike",
+                lastName = "Johnson",
                 dateOfBirth = "2007-12-10",
                 gender = "Male",
-                email = "mike.johnson@email.com",
-                phone = "123-456-7892",
+                nicNumber = "",
+                studentPhone = "123-456-7892",
+                studentEmail = "mike.johnson@email.com",
                 address = "789 Pine St, City",
-                parentName = "David Johnson",
-                parentPhone = "987-654-3212",
-                parentEmail = "david.johnson@email.com",
+                city = "Galle",
+                studentId = "STU003",
+                classCategories = listOf("MATH_11", "BIO_11"),
+                currentGrade = "Grade 11",
                 admissionDate = "2022-01-15",
-                photoUrl = "",
-                attendanceRate = 78,
-                paymentStatus = "OVERDUE",
-                gradeAverage = "C+",
+                guardianName = "David Johnson",
+                guardianPhone = "987-654-3212",
+                guardianEmail = "david.johnson@email.com",
+                guardianAddress = "789 Pine St, City",
                 totalFees = 5500.0,
                 paidAmount = 2000.0,
-                pendingAmount = 3500.0
+                pendingAmount = 3500.0,
+                paymentStatus = "OVERDUE",
+                attendanceRate = 78.0,
+                gradeAverage = 65.5,
+                photoUrl = "",
+                medicalConditions = "",
+                notes = "",
+                studentUserId = "auth_user_003",
+                guardianUserId = "auth_guardian_003",
+                isActive = true,
+                registrationDate = "2022-01-15 10:00:00",
+                lastUpdated = "2022-01-15 10:00:00",
+                registeredBy = "Admin"
             )
         ))
 
@@ -101,10 +134,10 @@ object StudentRepository {
                 amount = 2500.0,
                 paymentDate = Date(),
                 paymentMethod = "Credit Card",
-                description = "Tuition Fee - Semester 1",
+                note = "Tuition Fee - Semester 1",
                 status = "COMPLETED",
-                receiptNumber = "RCP001",
-                dueDate = Date()
+                referenceNumber = "RCP001",
+                paymentMonth = "2025-07"
             ),
             Payment(
                 id = "PAY002",
@@ -112,10 +145,10 @@ object StudentRepository {
                 amount = 2500.0,
                 paymentDate = Calendar.getInstance().apply { add(Calendar.MONTH, -1) }.time,
                 paymentMethod = "Bank Transfer",
-                description = "Tuition Fee - Semester 2",
+                note = "Tuition Fee - Semester 2",
                 status = "COMPLETED",
-                receiptNumber = "RCP002",
-                dueDate = Date()
+                referenceNumber = "RCP002",
+                paymentMonth = "2025-06"
             )
         ))
 
@@ -275,9 +308,10 @@ object StudentRepository {
 
     fun searchStudents(query: String): List<Student> {
         return students.filter {
-            it.name.contains(query, ignoreCase = true) ||
+            it.fullName.contains(query, ignoreCase = true) ||
                     it.id.contains(query, ignoreCase = true) ||
-                    it.rollNumber.contains(query, ignoreCase = true)
+                    it.studentId.contains(query, ignoreCase = true) ||
+                    it.studentEmail.contains(query, ignoreCase = true)
         }
     }
 }

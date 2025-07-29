@@ -46,82 +46,54 @@ class AttendanceFragment : Fragment() {
         recyclerAttendance.adapter = adapter
 
         btnScanQr.setOnClickListener {
-            // Initialize QR scanner
-            val integrator = IntentIntegrator.forSupportFragment(this)
-            integrator.setPrompt("Scan student QR code")
-            integrator.setBeepEnabled(true)
-            integrator.setOrientationLocked(true)
-            integrator.captureActivity = CaptureActivityPortrait::class.java
-            integrator.initiateScan()
+            // Navigate to QR Attendance Activity instead of scanning in fragment
+            startActivity(Intent(requireContext(), QRAttendanceActivity::class.java))
         }
+
+        // Load attendance records when fragment is created
+        loadAttendanceRecords()
 
         return view
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-        if (result != null) {
-            if (result.contents == null) {
-                Toast.makeText(requireContext(), "Scan cancelled", Toast.LENGTH_SHORT).show()
-            } else {
-                val studentId = result.contents.trim()
-                fetchStudentDetailsAndMarkAttendance(studentId)
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
-
-    private fun fetchStudentDetailsAndMarkAttendance(studentId: String) {
-        // Get the Firestore instance
+    private fun loadAttendanceRecords() {
         val firestore = FirebaseFirestore.getInstance()
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 
-        // Fetch student details
-        firestore.collection("students")
-            .document(studentId)
+        // Get current teacher's attendance records for today
+        firestore.collection("attendance")
+            .whereEqualTo("date", today)
             .get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val studentName = document.getString("name") ?: "Unknown Student"
-                    markAttendance(studentId, studentName)
-                } else {
-                    Toast.makeText(requireContext(), "Student not found", Toast.LENGTH_SHORT).show()
+            .addOnSuccessListener { documents ->
+                attendanceRecords.clear()
+                for (document in documents) {
+                    val record = AttendanceRecord(
+                        studentId = document.getString("studentId") ?: "",
+                        studentName = document.getString("studentName") ?: "",
+                        timestamp = document.getString("timestamp") ?: "",
+                        status = document.getString("status") ?: "Present"
+                    )
+                    attendanceRecords.add(record)
+                }
+                // Sort by timestamp (newest first)
+                attendanceRecords.sortByDescending { it.timestamp }
+
+                // Create new adapter with updated data
+                adapter = FragmentAttendanceAdapter(attendanceRecords)
+                recyclerAttendance.adapter = adapter
+
+                if (attendanceRecords.isEmpty()) {
+                    Toast.makeText(requireContext(), "No attendance records for today", Toast.LENGTH_SHORT).show()
                 }
             }
-            .addOnFailureListener {
-                Toast.makeText(requireContext(), "Failed to fetch student details", Toast.LENGTH_SHORT).show()
+            .addOnFailureListener { exception ->
+                Toast.makeText(requireContext(), "Failed to load attendance: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
-    private fun markAttendance(studentId: String, studentName: String) {
-        val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
-
-        // Create attendance record
-        val record = AttendanceRecord(
-            studentId = studentId,
-            studentName = studentName,
-            timestamp = timestamp
-        )
-
-        // Add to local list and update adapter
-        attendanceRecords.add(record)
-        adapter.notifyDataSetChanged()
-
-        // Save to Firestore
-        val firestore = FirebaseFirestore.getInstance()
-        val attendanceMap = HashMap<String, Any>()
-        attendanceMap["studentId"] = studentId
-        attendanceMap["studentName"] = studentName
-        attendanceMap["timestamp"] = timestamp
-        attendanceMap["status"] = "Present"
-
-        firestore.collection("attendance")
-            .add(attendanceMap)
-            .addOnSuccessListener {
-                Toast.makeText(requireContext(), "Attendance marked: $studentName", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener {
-                Toast.makeText(requireContext(), "Failed to mark attendance", Toast.LENGTH_SHORT).show()
-            }
+    override fun onResume() {
+        super.onResume()
+        // Reload attendance records when returning to fragment
+        loadAttendanceRecords()
     }
 }

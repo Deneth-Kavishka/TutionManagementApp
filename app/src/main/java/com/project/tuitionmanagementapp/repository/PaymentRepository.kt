@@ -15,10 +15,10 @@ object PaymentRepository {
                 amount = 2500.0,
                 paymentDate = Date(),
                 paymentMethod = "Credit Card",
-                description = "Tuition Fee - Semester 1",
+                note = "Tuition Fee - Semester 1",
                 status = "COMPLETED",
-                receiptNumber = "RCP001",
-                dueDate = Date()
+                referenceNumber = "RCP001",
+                paymentMonth = "2025-07"
             ),
             Payment(
                 id = "PAY002",
@@ -26,10 +26,10 @@ object PaymentRepository {
                 amount = 2500.0,
                 paymentDate = Calendar.getInstance().apply { add(Calendar.MONTH, -1) }.time,
                 paymentMethod = "Bank Transfer",
-                description = "Tuition Fee - Semester 2",
+                note = "Tuition Fee - Semester 2",
                 status = "COMPLETED",
-                receiptNumber = "RCP002",
-                dueDate = Date()
+                referenceNumber = "RCP002",
+                paymentMonth = "2025-06"
             ),
             Payment(
                 id = "PAY003",
@@ -37,10 +37,10 @@ object PaymentRepository {
                 amount = 1500.0,
                 paymentDate = Date(),
                 paymentMethod = "Cash",
-                description = "Tuition Fee - Partial",
+                note = "Tuition Fee - Partial",
                 status = "COMPLETED",
-                receiptNumber = "RCP003",
-                dueDate = Date()
+                referenceNumber = "RCP003",
+                paymentMonth = "2025-07"
             )
         ))
     }

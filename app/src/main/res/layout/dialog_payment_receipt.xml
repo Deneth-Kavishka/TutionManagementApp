@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@color/white">
+
+    <!-- Header -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ACADEMIX Tuition Center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="@color/purple_500"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Payment Receipt"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Receipt Details -->
+    <TextView
+        android:id="@+id/tvReceiptNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Receipt #: 1234567890"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:id="@+id/tvReceiptDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Date: 29 Jul 2025, 14:30"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Student Information -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E0E0E0"
+        android:layout_marginBottom="12dp" />
+
+    <TextView
+        android:id="@+id/tvStudentNameReceipt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Student: John Doe"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:id="@+id/tvStudentIdReceipt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ID: STU001"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:id="@+id/tvClassReceipt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Class: Grade 12 - Chemistry Theory"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Payment Details -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E0E0E0"
+        android:layout_marginBottom="12dp" />
+
+    <TextView
+        android:id="@+id/tvAmountReceipt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Amount Paid: Rs 5,000"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorPrimary"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:id="@+id/tvPaymentMethodReceipt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Method: Cash"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:id="@+id/tvReferenceReceipt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Reference: TXN123456"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Footer -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E0E0E0"
+        android:layout_marginBottom="12dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Thank you for your payment!"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="@color/purple_500"
+        android:layout_marginBottom="20dp" />
+
+    <!-- Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btnPrintReceipt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Print"
+            android:layout_marginEnd="8dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+        <Button
+            android:id="@+id/btnShareReceipt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Share"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+</LinearLayout>

@@ -37,14 +37,14 @@ class ResultAdapter(
 
         holder.studentName.text = result.studentName
         holder.subject.text = result.subject
-        holder.marks.text = "${result.marks}/${result.totalMarks}"
+        holder.marks.text = "${result.marks}/100" // Assuming 100 as total marks
         holder.grade.text = result.grade
-        holder.date.text = formatDate(result.examDate)
+        holder.date.text = formatDate(result.uploadDate)
 
         // Set grade color based on result
         val gradeColor = when {
-            result.marks >= (result.totalMarks * 0.8) -> holder.itemView.context.getColor(R.color.green)
-            result.marks >= (result.totalMarks * 0.4) -> holder.itemView.context.getColor(R.color.purple_700)
+            result.marks >= 80 -> holder.itemView.context.getColor(R.color.green)
+            result.marks >= 40 -> holder.itemView.context.getColor(R.color.purple_700)
             else -> holder.itemView.context.getColor(R.color.red)
         }
         holder.grade.setTextColor(gradeColor)
@@ -55,8 +55,12 @@ class ResultAdapter(
 
     override fun getItemCount() = results.size
 
-    private fun formatDate(timestamp: Long): String {
-        val sdf = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-        return sdf.format(Date(timestamp))
+    private fun formatDate(timestamp: com.google.firebase.Timestamp?): String {
+        return if (timestamp != null) {
+            val sdf = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+            sdf.format(timestamp.toDate())
+        } else {
+            "Unknown date"
+        }
     }
 }

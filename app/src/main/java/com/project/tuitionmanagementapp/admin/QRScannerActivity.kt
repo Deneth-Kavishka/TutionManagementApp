@@ -1,486 +1,460 @@
 package com.project.tuitionmanagementapp.admin
 
-import android.Manifest
-import android.animation.ValueAnimator
-import android.content.Context
+import android.app.Dialog
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.ImageFormat
-import android.graphics.Point
-import android.graphics.SurfaceTexture
-import android.hardware.camera2.*
-import android.media.ImageReader
-import android.os.*
-import android.util.Log
-import android.util.Size
-import android.view.Surface
-import android.view.SurfaceHolder
-import android.view.SurfaceView
-import android.view.View
-import android.view.animation.LinearInterpolator
-import android.view.animation.OvershootInterpolator
-import android.widget.ImageView
-import android.widget.Toast
+import android.os.Bundle
+import android.view.Window
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import com.google.zxing.*
-import com.google.zxing.common.HybridBinarizer
+import androidx.cardview.widget.CardView
+import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.FirebaseDatabase
+import com.google.zxing.integration.android.IntentIntegrator
+import com.google.zxing.integration.android.IntentResult
 import com.project.tuitionmanagementapp.R
+import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.Executors
-import android.hardware.camera2.CameraCharacteristics
-import kotlin.math.abs
 
-class QRScannerActivity : AppCompatActivity(), SurfaceHolder.Callback {
+class QRScannerActivity : AppCompatActivity() {
 
-    // UI Components
-    private lateinit var surfaceView: SurfaceView
-    private lateinit var btnBack: ImageView
-    private lateinit var btnFlashlight: ImageView
-    private lateinit var scanLine: View
-    private lateinit var scanSuccess: ImageView
-
-    // Camera Components
-    private var cameraManager: CameraManager? = null
-    private var cameraDevice: CameraDevice? = null
-    private var captureSession: CameraCaptureSession? = null
-    private var imageReader: ImageReader? = null
-
-    // ZXing Components
-    private val zxingReader = MultiFormatReader()
-    private val zxingHints = mapOf(
-        DecodeHintType.TRY_HARDER to true,
-        DecodeHintType.POSSIBLE_FORMATS to listOf(BarcodeFormat.QR_CODE)
-    )
-
-    // Threading
-    private val cameraExecutor = Executors.newSingleThreadExecutor()
-    private lateinit var backgroundHandler: Handler
-
-    // State Variables
-    private var isFlashlightOn = false
-    private var isScanning = true
-    private var optimalPreviewSize: Size? = null
-    private var lastProcessedTime = 0L
-
-    companion object {
-        private const val TAG = "QRScanner"
-        private const val CAMERA_PERMISSION_REQUEST_CODE = 1001
-        private const val SCAN_ANIMATION_DURATION = 1500L
-        private const val SUCCESS_FEEDBACK_DURATION = 1000L
-        private const val PROCESSING_INTERVAL_MS = 500L
-    }
-
-    // Camera State Callback
-    private val stateCallback = object : CameraDevice.StateCallback() {
-        override fun onOpened(camera: CameraDevice) {
-            cameraDevice = camera
-            createCameraPreviewSession()
-            startScanAnimation()
-        }
-
-        override fun onDisconnected(camera: CameraDevice) {
-            camera.close()
-            cameraDevice = null
-        }
-
-        override fun onError(camera: CameraDevice, error: Int) {
-            camera.close()
-            cameraDevice = null
-            showError("Camera error: $error")
-        }
-    }
+    private lateinit var auth: FirebaseAuth
+    private lateinit var firestore: FirebaseFirestore
+    private lateinit var database: FirebaseDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_qr_scanner)
 
-        // Initialize background handler
-        val handlerThread = HandlerThread("CameraBackground").apply { start() }
-        backgroundHandler = Handler(handlerThread.looper)
+        // Initialize Firebase
+        auth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
+        database = FirebaseDatabase.getInstance()
 
-        // Initialize ZXing reader
-        zxingReader.setHints(zxingHints)
-
-        initializeViews()
-        setupClickListeners()
-        checkCameraPermission()
+        initViews()
+        startQRScanner()
     }
 
-    private fun initializeViews() {
-        surfaceView = findViewById(R.id.surfaceView)
-        btnBack = findViewById(R.id.btnBack)
-        btnFlashlight = findViewById(R.id.btnFlashlight)
-        scanLine = findViewById(R.id.scanLine)
-        scanSuccess = findViewById(R.id.scanSuccess)
-
-        surfaceView.holder.addCallback(this)
-    }
-
-    private fun setupClickListeners() {
-        btnBack.setOnClickListener { finish() }
-        btnFlashlight.setOnClickListener { toggleFlashlight() }
-    }
-
-    private fun checkCameraPermission() {
-        when {
-            ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED -> {
-                setupCamera()
-            }
-            ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA) -> {
-                Toast.makeText(this, "Camera permission is required", Toast.LENGTH_LONG).show()
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_REQUEST_CODE)
-            }
-            else -> {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_REQUEST_CODE)
-            }
-        }
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                setupCamera()
-            } else {
-                Toast.makeText(this, "Camera permission denied", Toast.LENGTH_LONG).show()
-                finish()
-            }
-        }
-    }
-
-    private fun setupCamera() {
-        try {
-            cameraManager = getSystemService(CAMERA_SERVICE) as CameraManager
-            checkFlashlightAvailability()
-        } catch (e: Exception) {
-            Log.e(TAG, "Camera setup failed", e)
-            showError("Camera setup failed")
+    private fun initViews() {
+        findViewById<ImageView>(R.id.btnBack)?.setOnClickListener {
             finish()
         }
+
+        findViewById<Button>(R.id.btnScanAgain)?.setOnClickListener {
+            startQRScanner()
+        }
     }
 
-    override fun surfaceCreated(holder: SurfaceHolder) {
-        openCamera()
+    private fun startQRScanner() {
+        val integrator = IntentIntegrator(this)
+        integrator.setPrompt("Scan Student QR Code for Details & Payment")
+        integrator.setBeepEnabled(true)
+        integrator.setOrientationLocked(true)
+        integrator.setCameraId(0)
+        integrator.setBarcodeImageEnabled(true)
+        integrator.initiateScan()
     }
 
-    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-        // No-op
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        val result: IntentResult? = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+
+        if (result != null) {
+            if (result.contents == null) {
+                Toast.makeText(this, "Scan cancelled", Toast.LENGTH_SHORT).show()
+                finish()
+            } else {
+                try {
+                    val studentId = result.contents.trim()
+                    Toast.makeText(this, "QR Scanned: $studentId", Toast.LENGTH_LONG).show()
+
+                    // Show "Scan Again" button while processing
+                    findViewById<Button>(R.id.btnScanAgain)?.visibility = android.view.View.VISIBLE
+
+                    fetchStudentDetailsAndShowDialog(studentId)
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Error processing QR: ${e.message}", Toast.LENGTH_LONG).show()
+                    e.printStackTrace()
+                    // Show error dialog instead of just closing
+                    showInvalidQRDialog("Error", "Failed to process QR code: ${e.message}")
+                }
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
     }
 
-    override fun surfaceDestroyed(holder: SurfaceHolder) {
-        closeCamera()
-    }
+    private fun fetchStudentDetailsAndShowDialog(studentId: String) {
+        Toast.makeText(this, "Loading student details...", Toast.LENGTH_SHORT).show()
 
-    private fun openCamera() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+        // Validate QR content first
+        if (studentId.isBlank() || studentId.length < 3) {
+            showInvalidQRDialog("Invalid QR Code", "The scanned QR code does not contain a valid student ID.")
             return
         }
 
-        try {
-            val cameraId = getCameraId()
-            setupOptimalPreviewSize(cameraId)
-            cameraManager?.openCamera(cameraId, stateCallback, backgroundHandler)
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to open camera", e)
-            showError("Failed to open camera")
-        }
-    }
+        // Try Firestore first
+        firestore.collection("students")
+            .document(studentId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val studentName = document.getString("name") ?: "Unknown Student"
+                    val email = document.getString("email") ?: ""
+                    val grade = document.getString("grade") ?: ""
+                    val phone = document.getString("phone") ?: ""
+                    val address = document.getString("address") ?: ""
+                    val paymentStatus = document.getString("paymentStatus") ?: "UNKNOWN"
+                    val pendingAmount = document.getDouble("pendingAmount") ?: 0.0
+                    val lastPaymentDate = document.getString("lastPaymentDate") ?: ""
+                    val monthlyFee = document.getDouble("monthlyFee") ?: 0.0
+                    val parentName = document.getString("parentName") ?: ""
+                    val parentPhone = document.getString("parentPhone") ?: ""
 
-    private fun getCameraId(): String {
-        return cameraManager?.cameraIdList?.firstOrNull { id ->
-            val characteristics = cameraManager?.getCameraCharacteristics(id)
-            characteristics?.get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_BACK
-        } ?: throw IllegalStateException("No back camera found")
-    }
-
-    private fun setupOptimalPreviewSize(cameraId: String): Size {
-        val characteristics = cameraManager!!.getCameraCharacteristics(cameraId)
-        val map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)!!
-
-        // Get the device's screen aspect ratio
-        val display = windowManager.defaultDisplay
-        val realSize = Point()
-        display.getRealSize(realSize)
-        val screenRatio = realSize.y.toFloat() / realSize.x.toFloat()
-
-        // Get all available preview sizes and sort by area (descending)
-        val previewSizes = map.getOutputSizes(SurfaceTexture::class.java)
-            .sortedByDescending { it.width * it.height }
-
-        // Find the size that best matches the screen aspect ratio
-        return previewSizes.maxByOrNull {
-            val previewRatio = it.height.toFloat() / it.width.toFloat()
-            abs(previewRatio - screenRatio)
-        } ?: previewSizes[0] // Fallback to largest size
-    }
-
-    private fun createCameraPreviewSession() {
-        try {
-            val surface = surfaceView.holder.surface
-            val cameraId = getCameraId()
-            val previewSize = setupOptimalPreviewSize(cameraId)
-
-            Log.d(TAG, "Using preview size: ${previewSize.width}x${previewSize.height}")
-
-            // Set fixed size for the surface
-            surfaceView.holder.setFixedSize(previewSize.width, previewSize.height)
-
-            // Create ImageReader with optimal size
-            imageReader = ImageReader.newInstance(
-                previewSize.width,
-                previewSize.height,
-                ImageFormat.YUV_420_888,
-                2
-            ).apply {
-                setOnImageAvailableListener({ reader ->
-                    try {
-                        reader.acquireLatestImage()?.use { image ->
-                            processImage(image)
-                        }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Image processing error", e)
-                    }
-                }, backgroundHandler)
-            }
-
-            // Prepare the capture request
-            val previewRequestBuilder = cameraDevice!!.createCaptureRequest(
-                CameraDevice.TEMPLATE_PREVIEW
-            ).apply {
-                addTarget(surface)
-                addTarget(imageReader!!.surface)
-
-                // Auto-focus and auto-exposure for better QR detection
-                set(CaptureRequest.CONTROL_AF_MODE,
-                    CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
-                set(CaptureRequest.CONTROL_AE_MODE,
-                    CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH)
-            }
-
-            // Create the capture session
-            cameraDevice?.createCaptureSession(
-                listOf(surface, imageReader!!.surface),
-                object : CameraCaptureSession.StateCallback() {
-                    override fun onConfigured(session: CameraCaptureSession) {
-                        try {
-                            captureSession = session
-                            session.setRepeatingRequest(
-                                previewRequestBuilder.build(),
-                                null,
-                                backgroundHandler
-                            )
-                        } catch (e: CameraAccessException) {
-                            Log.e(TAG, "Failed to start preview", e)
-                        }
-                    }
-
-                    override fun onConfigureFailed(session: CameraCaptureSession) {
-                        showError("Camera configuration failed")
-                    }
-                },
-                backgroundHandler
-            )
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to create preview session", e)
-            showError("Camera session failed")
-        }
-    }
-
-    private fun processImage(image: android.media.Image) {
-        try {
-            if (!isScanning) return
-
-            // Limit processing rate to prevent overload
-            val currentTime = System.currentTimeMillis()
-            if (currentTime - lastProcessedTime < PROCESSING_INTERVAL_MS) {
-                return
-            }
-            lastProcessedTime = currentTime
-
-            // Convert Image to ZXing-compatible format
-            val yuvData = image.planes[0].buffer
-            val width = image.width
-            val height = image.height
-            val source = PlanarYUVLuminanceSource(
-                yuvData.array(),
-                width,
-                height,
-                0, 0, // No cropping
-                width,
-                height,
-                false // Not rotated
-            )
-
-            val binaryBitmap = BinaryBitmap(HybridBinarizer(source))
-
-            try {
-                val result = zxingReader.decodeWithState(binaryBitmap)
-                result.text?.let { qrContent ->
-                    isScanning = false
-                    handleQRCodeResult(qrContent)
+                    showStudentDetailsDialog(
+                        studentId, studentName, email, grade, phone, address,
+                        paymentStatus, pendingAmount, lastPaymentDate, monthlyFee,
+                        parentName, parentPhone
+                    )
+                } else {
+                    // Try Realtime Database
+                    checkStudentInRealtimeDatabase(studentId)
                 }
-            } catch (e: NotFoundException) {
-                // QR code not found in this frame - normal during scanning
-            } catch (e: Exception) {
-                Log.e(TAG, "ZXing decoding error", e)
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Image processing error", e)
-        } finally {
-            image.close()
-        }
-    }
-
-    private fun handleQRCodeResult(qrContent: String) {
-        runOnUiThread {
-            showSuccessFeedback()
-            vibrateDevice(200)
-
-            Handler(Looper.getMainLooper()).postDelayed({
-                val intent = Intent(this, StudentDetailsActivity::class.java).apply {
-                    putExtra("student_id", qrContent)
-                    putExtra("scanned_from_qr", true)
-                }
-                startActivity(intent)
-                finish()
-            }, SUCCESS_FEEDBACK_DURATION)
-        }
-    }
-
-    private fun toggleFlashlight() {
-        try {
-            val cameraId = getCameraId()
-            val characteristics = cameraManager?.getCameraCharacteristics(cameraId)
-            val hasFlash = characteristics?.get(CameraCharacteristics.FLASH_INFO_AVAILABLE) == true
-
-            if (hasFlash) {
-                isFlashlightOn = !isFlashlightOn
-                updateFlashlightState()
+            .addOnFailureListener {
+                checkStudentInRealtimeDatabase(studentId)
             }
-        } catch (e: Exception) {
-            showError("Flash error")
-        }
     }
 
-    private fun updateFlashlightState() {
-        try {
-            val previewRequestBuilder = cameraDevice?.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW).apply {
-                this?.addTarget(surfaceView.holder.surface)
-                this?.addTarget(imageReader?.surface!!)
-                this?.set(
-                    CaptureRequest.FLASH_MODE,
-                    if (isFlashlightOn) CaptureRequest.FLASH_MODE_TORCH else CaptureRequest.FLASH_MODE_OFF
-                )
-                runOnUiThread {
-                    btnFlashlight.setImageResource(
-                        if (isFlashlightOn) R.drawable.ic_flashlight_on else R.drawable.ic_flashlight_off
+    private fun checkStudentInRealtimeDatabase(studentId: String) {
+        database.reference.child("students").child(studentId)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
+                    val studentName = snapshot.child("name").getValue(String::class.java) ?: "Student $studentId"
+                    val email = snapshot.child("email").getValue(String::class.java) ?: ""
+                    val grade = snapshot.child("grade").getValue(String::class.java) ?: ""
+                    val phone = snapshot.child("phone").getValue(String::class.java) ?: ""
+                    val address = snapshot.child("address").getValue(String::class.java) ?: ""
+                    val paymentStatus = snapshot.child("paymentStatus").getValue(String::class.java) ?: "UNKNOWN"
+                    val pendingAmount = snapshot.child("pendingAmount").getValue(Double::class.java) ?: 0.0
+                    val lastPaymentDate = snapshot.child("lastPaymentDate").getValue(String::class.java) ?: ""
+                    val monthlyFee = snapshot.child("monthlyFee").getValue(Double::class.java) ?: 0.0
+                    val parentName = snapshot.child("parentName").getValue(String::class.java) ?: ""
+                    val parentPhone = snapshot.child("parentPhone").getValue(String::class.java) ?: ""
+
+                    showStudentDetailsDialog(
+                        studentId, studentName, email, grade, phone, address,
+                        paymentStatus, pendingAmount, lastPaymentDate, monthlyFee,
+                        parentName, parentPhone
+                    )
+                } else {
+                    // No student found in either database
+                    showInvalidQRDialog(
+                        "Student Not Found",
+                        "No student found with ID: $studentId\n\nThis QR code may not be from our system or the student may not be registered yet."
                     )
                 }
             }
-
-            previewRequestBuilder?.build()?.let { request ->
-                captureSession?.setRepeatingRequest(request, null, backgroundHandler)
+            .addOnFailureListener { exception ->
+                showInvalidQRDialog(
+                    "Database Error",
+                    "Failed to verify student ID: ${exception.message ?: "Unknown error"}\n\nPlease check your internet connection and try again."
+                )
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to update flashlight", e)
-        }
     }
 
-    private fun checkFlashlightAvailability() {
-        try {
-            val cameraId = getCameraId()
-            val characteristics = cameraManager?.getCameraCharacteristics(cameraId)
-            val hasFlash = characteristics?.get(CameraCharacteristics.FLASH_INFO_AVAILABLE) ?: false
-            runOnUiThread {
-                btnFlashlight.visibility = if (hasFlash) View.VISIBLE else View.GONE
+    private fun showInvalidQRDialog(title: String, message: String) {
+        val dialog = android.app.AlertDialog.Builder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .setPositiveButton("Scan Again") { _, _ ->
+                startQRScanner()
             }
-        } catch (e: Exception) {
-            runOnUiThread {
-                btnFlashlight.visibility = View.GONE
+            .setNegativeButton("Cancel") { _, _ ->
+                finish()
             }
-        }
+            .setCancelable(false)
+            .create()
+
+        dialog.show()
     }
 
-    private fun startScanAnimation() {
-        runOnUiThread {
-            scanLine.visibility = View.VISIBLE
-            ValueAnimator.ofFloat(0f, 1f).apply {
-                duration = SCAN_ANIMATION_DURATION
-                interpolator = LinearInterpolator()
-                repeatCount = ValueAnimator.INFINITE
-                repeatMode = ValueAnimator.REVERSE
-                addUpdateListener { animation ->
-                    val value = animation.animatedValue as Float
-                    scanLine.translationY = (value * 250) - 125 // Adjust for your frame size
+    private fun showStudentDetailsDialog(
+        studentId: String, studentName: String, email: String, grade: String,
+        phone: String, address: String, paymentStatus: String, pendingAmount: Double,
+        lastPaymentDate: String, monthlyFee: Double, parentName: String, parentPhone: String
+    ) {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.dialog_admin_student_details)
+        dialog.setCancelable(true)
+
+        // Find views in dialog
+        val tvStudentName = dialog.findViewById<TextView>(R.id.tvStudentName)
+        val tvStudentId = dialog.findViewById<TextView>(R.id.tvStudentId)
+        val tvEmail = dialog.findViewById<TextView>(R.id.tvEmail)
+        val tvGrade = dialog.findViewById<TextView>(R.id.tvGrade)
+        val tvPhone = dialog.findViewById<TextView>(R.id.tvPhone)
+        val tvAddress = dialog.findViewById<TextView>(R.id.tvAddress)
+        val tvPaymentStatus = dialog.findViewById<TextView>(R.id.tvPaymentStatus)
+        val tvPendingAmount = dialog.findViewById<TextView>(R.id.tvPendingAmount)
+        val tvLastPayment = dialog.findViewById<TextView>(R.id.tvLastPayment)
+        val tvMonthlyFee = dialog.findViewById<TextView>(R.id.tvMonthlyFee)
+        val tvParentName = dialog.findViewById<TextView>(R.id.tvParentName)
+        val tvParentPhone = dialog.findViewById<TextView>(R.id.tvParentPhone)
+
+        val paymentStatusCard = dialog.findViewById<CardView>(R.id.paymentStatusCard)
+        val btnCloseDialog = dialog.findViewById<ImageView>(R.id.btnCloseDialog)
+        val btnMakePayment = dialog.findViewById<Button>(R.id.btnMakePayment)
+        val btnEditStudent = dialog.findViewById<Button>(R.id.btnEditStudent)
+        val btnViewHistory = dialog.findViewById<Button>(R.id.btnViewHistory)
+        val btnScanNext = dialog.findViewById<Button>(R.id.btnScanNext)
+
+        // Set student information with proper formatting
+        tvStudentName.text = studentName
+        tvStudentId.text = getString(R.string.student_id_format, studentId)
+        tvEmail.text = email.ifEmpty { getString(R.string.not_provided) }
+        tvGrade.text = grade.ifEmpty { getString(R.string.not_specified) }
+        tvPhone.text = phone.ifEmpty { getString(R.string.not_provided) }
+        tvAddress.text = address.ifEmpty { getString(R.string.not_provided) }
+        tvMonthlyFee.text = getString(R.string.currency_format, String.format(Locale.getDefault(), "%.2f", monthlyFee))
+        tvParentName.text = parentName.ifEmpty { getString(R.string.not_provided) }
+        tvParentPhone.text = parentPhone.ifEmpty { getString(R.string.not_provided) }
+        tvLastPayment.text = lastPaymentDate.ifEmpty { getString(R.string.no_payment_record) }
+
+        // Set payment status with colors and enable/disable payment button
+        when (paymentStatus) {
+            "PAID" -> {
+                tvPaymentStatus.text = getString(R.string.status_paid)
+                tvPaymentStatus.setTextColor(getColor(R.color.payment_paid))
+                tvPendingAmount.text = getString(R.string.no_pending_amount)
+                paymentStatusCard.setCardBackgroundColor(getColor(R.color.light_gray))
+                btnMakePayment.isEnabled = false
+                btnMakePayment.text = getString(R.string.payment_up_to_date)
+            }
+            "PENDING" -> {
+                tvPaymentStatus.text = getString(R.string.status_pending)
+                tvPaymentStatus.setTextColor(getColor(R.color.payment_pending))
+                tvPendingAmount.text = getString(R.string.outstanding_amount, String.format(Locale.getDefault(), "%.2f", pendingAmount))
+                paymentStatusCard.setCardBackgroundColor(getColor(R.color.light_blue))
+                btnMakePayment.isEnabled = true
+                btnMakePayment.text = getString(R.string.process_payment)
+            }
+            "OVERDUE" -> {
+                tvPaymentStatus.text = getString(R.string.status_overdue)
+                tvPaymentStatus.setTextColor(getColor(R.color.payment_overdue))
+                tvPendingAmount.text = getString(R.string.overdue_amount, String.format(Locale.getDefault(), "%.2f", pendingAmount))
+                paymentStatusCard.setCardBackgroundColor(getColor(R.color.light_blue))
+                btnMakePayment.isEnabled = true
+                btnMakePayment.text = getString(R.string.pay_overdue_amount)
+            }
+            else -> {
+                tvPaymentStatus.text = getString(R.string.status_unknown)
+                tvPaymentStatus.setTextColor(getColor(R.color.payment_unknown))
+                tvPendingAmount.text = getString(R.string.status_unknown_desc)
+                paymentStatusCard.setCardBackgroundColor(getColor(R.color.background_light))
+                btnMakePayment.isEnabled = true
+                btnMakePayment.text = getString(R.string.set_payment_status)
+            }
+        }
+
+        // Set click listeners
+        btnCloseDialog.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        btnMakePayment.setOnClickListener {
+            dialog.dismiss()
+            showPaymentDialog(studentId, studentName, pendingAmount, monthlyFee)
+        }
+
+        btnEditStudent.setOnClickListener {
+            dialog.dismiss()
+            openEditStudentActivity(studentId)
+        }
+
+        btnViewHistory.setOnClickListener {
+            dialog.dismiss()
+            openStudentHistoryActivity()
+        }
+
+        btnScanNext.setOnClickListener {
+            dialog.dismiss()
+            startQRScanner()
+        }
+
+        dialog.show()
+    }
+
+    private fun showPaymentDialog(studentId: String, studentName: String, pendingAmount: Double, monthlyFee: Double) {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.dialog_admin_payment)
+        dialog.setCancelable(true)
+
+        val tvStudentName = dialog.findViewById<TextView>(R.id.tvPaymentStudentName)
+        val tvStudentId = dialog.findViewById<TextView>(R.id.tvPaymentStudentId)
+        val etPaymentAmount = dialog.findViewById<TextInputEditText>(R.id.etPaymentAmount)
+        val spinnerPaymentType = dialog.findViewById<Spinner>(R.id.spinnerPaymentType)
+        val etPaymentNote = dialog.findViewById<TextInputEditText>(R.id.etPaymentNote)
+        val btnProcessPayment = dialog.findViewById<Button>(R.id.btnProcessPayment)
+        val btnCancelPayment = dialog.findViewById<Button>(R.id.btnCancelPayment)
+        val tvPendingAmount = dialog.findViewById<TextView>(R.id.tvPendingAmount)
+        val tvMonthlyFee = dialog.findViewById<TextView>(R.id.tvMonthlyFee)
+
+        tvStudentName.text = studentName
+        tvStudentId.text = getString(R.string.student_id_format, studentId)
+        tvPendingAmount.text = getString(R.string.pending_format, String.format(Locale.getDefault(), "%.2f", pendingAmount))
+        tvMonthlyFee.text = getString(R.string.monthly_fee_format, String.format(Locale.getDefault(), "%.2f", monthlyFee))
+        etPaymentAmount.setText(pendingAmount.toString())
+
+        // Setup payment type spinner
+        val paymentTypes = arrayOf("Cash", "Bank Transfer", "Online Payment", "Cheque")
+        spinnerPaymentType.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, paymentTypes)
+
+        btnProcessPayment.setOnClickListener {
+            val amount = etPaymentAmount.text.toString().toDoubleOrNull()
+            val paymentType = spinnerPaymentType.selectedItem.toString()
+            val note = etPaymentNote.text.toString()
+
+            if (amount == null || amount <= 0) {
+                Toast.makeText(this, getString(R.string.enter_valid_amount), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            processPayment(studentId, studentName, amount, paymentType, note, dialog)
+        }
+
+        btnCancelPayment.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun processPayment(studentId: String, studentName: String, amount: Double,
+                              paymentType: String, note: String, dialog: Dialog) {
+        val currentTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+        val paymentId = "PAY_${System.currentTimeMillis()}"
+
+        // Create payment record
+        val paymentData = hashMapOf(
+            "paymentId" to paymentId,
+            "studentId" to studentId,
+            "studentName" to studentName,
+            "amount" to amount,
+            "paymentType" to paymentType,
+            "note" to note,
+            "timestamp" to currentTime,
+            "processedBy" to (auth.currentUser?.email ?: "admin"),
+            "status" to "COMPLETED"
+        )
+
+        // Save payment to database
+        firestore.collection("payments")
+            .document(paymentId)
+            .set(paymentData)
+            .addOnSuccessListener {
+                // Update student payment status
+                updateStudentPaymentStatus(studentId, amount)
+                dialog.dismiss()
+
+                Toast.makeText(this, getString(R.string.payment_success, String.format(Locale.getDefault(), "%.2f", amount), studentName),
+                    Toast.LENGTH_LONG).show()
+
+                // Show payment receipt dialog
+                showPaymentReceiptDialog(paymentId, studentName, amount, paymentType, currentTime)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, getString(R.string.payment_failed, e.message), Toast.LENGTH_LONG).show()
+            }
+    }
+
+    private fun updateStudentPaymentStatus(studentId: String, paidAmount: Double) {
+        firestore.collection("students")
+            .document(studentId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val currentPending = document.getDouble("pendingAmount") ?: 0.0
+                    val newPending = (currentPending - paidAmount).coerceAtLeast(0.0)
+                    val newStatus = if (newPending <= 0) "PAID" else "PENDING"
+                    val currentTime = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+
+                    val updates = hashMapOf<String, Any>(
+                        "pendingAmount" to newPending,
+                        "paymentStatus" to newStatus,
+                        "lastPaymentDate" to currentTime
+                    )
+
+                    firestore.collection("students")
+                        .document(studentId)
+                        .update(updates)
                 }
-                start()
             }
-        }
     }
 
-    private fun showSuccessFeedback() {
-        runOnUiThread {
-            scanSuccess.scaleX = 0f
-            scanSuccess.scaleY = 0f
-            scanSuccess.visibility = View.VISIBLE
+    private fun showPaymentReceiptDialog(paymentId: String, studentName: String, amount: Double,
+                                       paymentType: String, timestamp: String) {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.dialog_payment_receipt)
+        dialog.setCancelable(true)
 
-            scanSuccess.animate()
-                .scaleX(1f)
-                .scaleY(1f)
-                .setDuration(300)
-                .setInterpolator(OvershootInterpolator())
-                .start()
+        val tvReceiptTitle = dialog.findViewById<TextView>(R.id.tvReceiptTitle)
+        val tvReceiptPaymentId = dialog.findViewById<TextView>(R.id.tvReceiptPaymentId)
+        val tvReceiptStudentName = dialog.findViewById<TextView>(R.id.tvReceiptStudentName)
+        val tvReceiptAmount = dialog.findViewById<TextView>(R.id.tvReceiptAmount)
+        val tvReceiptPaymentType = dialog.findViewById<TextView>(R.id.tvReceiptPaymentType)
+        val tvReceiptTimestamp = dialog.findViewById<TextView>(R.id.tvReceiptTimestamp)
+        val btnPrintReceipt = dialog.findViewById<Button>(R.id.btnPrintReceipt)
+        val btnShareReceipt = dialog.findViewById<Button>(R.id.btnShareReceipt)
+        val btnCloseReceipt = dialog.findViewById<Button>(R.id.btnCloseReceipt)
+
+        tvReceiptTitle.text = getString(R.string.payment_receipt)
+        tvReceiptPaymentId.text = getString(R.string.receipt_id_format, paymentId)
+        tvReceiptStudentName.text = getString(R.string.student_name_format, studentName)
+        tvReceiptAmount.text = getString(R.string.amount_format, String.format(Locale.getDefault(), "%.2f", amount))
+        tvReceiptPaymentType.text = getString(R.string.payment_method_format, paymentType)
+        tvReceiptTimestamp.text = getString(R.string.date_time_format, timestamp)
+
+        btnPrintReceipt.setOnClickListener {
+            Toast.makeText(this, getString(R.string.print_feature_coming_soon), Toast.LENGTH_SHORT).show()
         }
+
+        btnShareReceipt.setOnClickListener {
+            val shareText = getString(R.string.receipt_share_format,
+                paymentId, studentName, String.format(Locale.getDefault(), "%.2f", amount), paymentType, timestamp)
+
+            val shareIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, shareText)
+                type = "text/plain"
+            }
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_receipt)))
+        }
+
+        btnCloseReceipt.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
-    private fun vibrateDevice(durationMs: Long) {
-        val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator?.vibrate(VibrationEffect.createOneShot(durationMs, VibrationEffect.DEFAULT_AMPLITUDE))
-        } else {
-            @Suppress("DEPRECATION")
-            vibrator?.vibrate(durationMs)
-        }
-    }
-
-    private fun showError(message: String) {
-        runOnUiThread {
-            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-        }
-    }
-
-    private fun closeCamera() {
+    private fun openEditStudentActivity(studentId: String) {
         try {
-            captureSession?.close()
-            cameraDevice?.close()
-            imageReader?.close()
+            val intent = Intent(this, StudentDetailsActivity::class.java)
+            intent.putExtra("studentId", studentId)
+            startActivity(intent)
         } catch (e: Exception) {
-            Log.e(TAG, "Error closing camera", e)
-        } finally {
-            captureSession = null
-            cameraDevice = null
-            imageReader = null
+            Toast.makeText(this, getString(R.string.edit_student_coming_soon), Toast.LENGTH_SHORT).show()
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (surfaceView.holder.surface.isValid) {
-            openCamera()
-        }
-        isScanning = true
-    }
-
-    override fun onPause() {
-        super.onPause()
-        closeCamera()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        closeCamera()
-        backgroundHandler.looper.quitSafely()
+    private fun openStudentHistoryActivity() {
+        Toast.makeText(this, getString(R.string.student_history_coming_soon), Toast.LENGTH_SHORT).show()
     }
 }

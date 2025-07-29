@@ -14,18 +14,51 @@
     <color name="yellow">#FFFFB300</color>
 
     <!-- Theme Colors -->
+    <color name="primary_color">@color/purple_500</color>
+    <color name="primary_dark">@color/purple_700</color>
+    <color name="accent_color">@color/teal_200</color>
     <color name="colorPrimary">@color/purple_500</color>
     <color name="colorPrimaryDark">@color/purple_700</color>
-    <color name="colorAccent">@color/teal_200</color>
-    <color name="colorSuccess">#4CAF50</color>
+
+    <!-- Additional Theme Colors -->
+    <color name="secondary_color">#FF757575</color>
+    <color name="danger_color">#FFE53935</color>
+    <color name="success_color">#FF43A047</color>
+    <color name="warning_color">#FFFFB300</color>
+    <color name="info_color">#FF2196F3</color>
+    <color name="colorAccent">#FF03DAC5</color>
+    <color name="colorSuccess">#FF4CAF50</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#BDBDBD</color>
+
+    <!-- Background Colors -->
+    <color name="background_light">#FAFAFA</color>
+    <color name="background_dark">#303030</color>
+    <color name="background_color">#FFFAFAFA</color>
 
     <!-- Neutral Colors -->
     <color name="gray">#757575</color>
     <color name="gray_light">#EEEEEE</color>
+    <color name="light_gray">#F5F5F5</color>
     <color name="light_blue">#E3F2FD</color>
+    <color name="divider_color">#E0E0E0</color>
+    <color name="border_color">#FFE0E0E0</color>
 
     <!-- Status Background Colors -->
     <color name="present_bg">#1543A047</color>
     <color name="absent_bg">#15E53935</color>
     <color name="late_bg">#15FFB300</color>
+
+    <!-- Payment Status Colors -->
+    <color name="payment_paid">#4CAF50</color>
+    <color name="payment_pending">#FF9800</color>
+    <color name="payment_overdue">#F44336</color>
+    <color name="payment_unknown">#9E9E9E</color>
+
+    <!-- UI Colors -->
+    <color name="text_color_primary">#FF212121</color>
+    <color name="text_color_secondary">#FF757575</color>
 </resources>

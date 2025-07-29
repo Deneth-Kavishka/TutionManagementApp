@@ -86,177 +86,75 @@ class ClassScheduleActivity : AppCompatActivity() {
             .addOnSuccessListener { documents ->
                 scheduleList.clear()
                 for (document in documents) {
-                    val schedule = document.toObject(ClassSchedule::class.java).apply {
-                        id = document.id
-                    }
-                    scheduleList.add(schedule)
-                }
-                scheduleList.sortBy { it.startTime }
-                adapter.notifyDataSetChanged()
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Failed to load schedule", Toast.LENGTH_SHORT).show()
-            }
-    }
-
-    private fun showAddClassDialog() {
-        val dialog = ClassScheduleDialog(this, selectedDate) { schedule ->
-            saveSchedule(schedule)
-        }
-        dialog.show()
-    }
-
-    private fun showEditClassDialog(schedule: ClassSchedule) {
-        val dialog = ClassScheduleDialog(this, selectedDate, schedule) { updatedSchedule ->
-            saveSchedule(updatedSchedule)
-        }
-        dialog.show()
-    }
-
-    private fun saveSchedule(schedule: ClassSchedule) {
-        val scheduleMap = hashMapOf(
-            "className" to schedule.className,
-            "teacherName" to schedule.teacherName,
-            "startTime" to schedule.startTime,
-            "endTime" to schedule.endTime,
-            "roomNumber" to schedule.roomNumber,
-            "recurring" to schedule.recurring,
-            "notificationEnabled" to schedule.notificationEnabled
-        )
-
-        val collection = firestore.collection("class_schedules")
-        val task = if (schedule.id != null) {
-            collection.document(schedule.id!!).set(scheduleMap)
-        } else {
-            collection.add(scheduleMap)
-        }
-
-        task.addOnSuccessListener {
-            Toast.makeText(this, "Schedule saved successfully", Toast.LENGTH_SHORT).show()
-            if (schedule.notificationEnabled) {
-                notificationHelper.scheduleClassNotification(schedule)
-            }
-            loadScheduleForDate(selectedDate)
-        }.addOnFailureListener {
-            Toast.makeText(this, "Failed to save schedule", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun deleteSchedule(schedule: ClassSchedule) {
-        schedule.id?.let { id ->
-            firestore.collection("class_schedules")
-                .document(id)
-                .delete()
-                .addOnSuccessListener {
-                    Toast.makeText(this, "Schedule deleted successfully", Toast.LENGTH_SHORT).show()
-                    loadScheduleForDate(selectedDate)
-                }
-                .addOnFailureListener {
-                    Toast.makeText(this, "Failed to delete schedule", Toast.LENGTH_SHORT).show()
-                }
-        }
-    }
-
-    private fun showAttendanceSheet(schedule: ClassSchedule) {
-        val dialog = android.app.AlertDialog.Builder(this)
-            .setView(R.layout.dialog_attendance_sheet)
-            .create()
-
-        dialog.show()
-
-        // Initialize dialog views
-        val className = dialog.findViewById<TextView>(R.id.tvClassName)
-        val date = dialog.findViewById<TextView>(R.id.tvDate)
-        val time = dialog.findViewById<TextView>(R.id.tvTime)
-        val recyclerView = dialog.findViewById<RecyclerView>(R.id.rvStudents)
-        val btnMarkAllPresent = dialog.findViewById<Button>(R.id.btnMarkAllPresent)
-        val btnMarkAllAbsent = dialog.findViewById<Button>(R.id.btnMarkAllAbsent)
-        val btnSave = dialog.findViewById<Button>(R.id.btnSave)
-
-        // Set class info
-        className?.text = schedule.className
-        date?.text = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
-            .format(Date(schedule.startTime))
-        time?.text = "${SimpleDateFormat("hh:mm a", Locale.getDefault())
-            .format(Date(schedule.startTime))} - ${SimpleDateFormat("hh:mm a", Locale.getDefault())
-            .format(Date(schedule.endTime))}"
-
-        // Load students and setup adapter
-        val attendanceRecords = ArrayList<AttendanceRecord>()
-        firestore.collection("students")
-            .whereEqualTo("class", schedule.className)
-            .get()
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    val studentId = document.id
-                    val studentName = document.getString("name") ?: "Unknown"
-                    attendanceRecords.add(
-                        AttendanceRecord(
-                            classScheduleId = schedule.id ?: "",
-                            className = schedule.className,
-                            studentId = studentId,
-                            studentName = studentName
-                        )
-                    )
-                }
-
-                val adapter = AttendanceAdapter(attendanceRecords) { studentId, status ->
-                    // Update status in the list
-                    attendanceRecords.find { it.studentId == studentId }?.let { record ->
-                        record.status = status
-                    }
-                }
-                recyclerView?.adapter = adapter
-                recyclerView?.layoutManager = LinearLayoutManager(this)
-
-                // Setup mark all buttons
-                btnMarkAllPresent?.setOnClickListener {
-                    adapter.markAllAs("present")
-                }
-                btnMarkAllAbsent?.setOnClickListener {
-                    adapter.markAllAs("absent")
-                }
-            }
-
-        // Save attendance
-        btnSave?.setOnClickListener {
-            saveAttendanceRecords(attendanceRecords, dialog)
-        }
-    }
-
-    private fun saveAttendanceRecords(records: List<AttendanceRecord>, dialog: android.app.AlertDialog) {
-        val batch = firestore.batch()
-
-        records.forEach { record ->
-            val docRef = firestore.collection("attendance").document()
-            batch.set(docRef, record)
-        }
-
-        batch.commit()
-            .addOnSuccessListener {
-                Toast.makeText(this, "Attendance saved successfully", Toast.LENGTH_SHORT).show()
-                dialog.dismiss()
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Failed to save attendance", Toast.LENGTH_SHORT).show()
-            }
-    }
-
-    private fun getStartOfDay(timestamp: Long): Long {
-        val calendar = Calendar.getInstance()
-        calendar.timeInMillis = timestamp
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 0)
-        calendar.set(Calendar.SECOND, 0)
-        return calendar.timeInMillis
-    }
-
-    private fun getEndOfDay(timestamp: Long): Long {
-        val calendar = Calendar.getInstance()
-        calendar.timeInMillis = timestamp
-        calendar.set(Calendar.HOUR_OF_DAY, 23)
-        calendar.set(Calendar.MINUTE, 59)
-        calendar.set(Calendar.SECOND, 59)
-        return calendar.timeInMillis
-    }
-}
+                    val schedule = document.toObject(ClassSchedule::class.java)
+                    schedule.id = document.id
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
+        val dialog = android.app.AlertDialog.Builder(this, R.style.Theme_MaterialComponents_DayNight_Dialog)
